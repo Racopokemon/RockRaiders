@@ -9,7 +9,7 @@ This will be a recreation of an unknown Lego video game from 1999 named _Rock Ra
 * Singleplayer [**C**]
 * Loading a level from file [**B**]
   * 3+ Level should be doable [**C**]
- * Technology
+  * Technology
    * Very basic top-down rendering with colored squares.
    * Enabling arbitrary framerates by interpolating motion between two ticks. This is also the foundation to the variable in-game time further below. [Maybe **C**]
 * Game
@@ -18,12 +18,12 @@ This will be a recreation of an unknown Lego video game from 1999 named _Rock Ra
   * Drilled walls drop resources depending if written in the level file.
   * A base station where all resources are brought
   * AI [maybe **B** or **A**]
-    * Navigation with Dijkstra (BFS would do it, but there are already different grounds with different speeds planned in the next section) [not that hard, but depends on the constantly changing level structure, maybe **B**]
-    * Tasks are assigned when they occur (resources appear etc.), updated and swapped automatically, tasks by the player are scheduled, and the workers execute all of them continuously without further player-interaction.
+      - Navigation with Dijkstra (BFS would do it, but there are already different grounds with different speeds planned in the next section) [not that hard, but depends on the constantly changing level structure, maybe **B**]
+      - Tasks are assigned when they occur (resources appear etc.), updated and swapped automatically, tasks by the player are scheduled, and the workers execute all of them continuously without further player-interaction.
   * AI-Tasks
-    * Drill walls
-    * Pick up resources
-    * Bring resources to the (closest) base station
+      - Drill walls
+      - Pick up resources
+      - Bring resources to the (closest) base station
 
 ### Hopefully makes it as well
 * Movable camera (e.g. when mouse at the rim of the screen), zooming in and out

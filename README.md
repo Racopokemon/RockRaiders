@@ -58,3 +58,6 @@ _I probably won’t realize many of those, but if I had infinite time, maybe I w
 * Navigation based on a navigation mesh for quicker /more realistic paths
 * Changing / pausing the in-game time somehow in-game.
 * Sound
+
+#### kleine Anmerkung
+OMG! Ich erinnere mich daran... Ich fand Lego Rock Raiders super cool, aber irgendwann war die CD glaube ich kaputt oder es lief aus einem anderen Grund nicht mehr... xD

@@ -17,7 +17,28 @@ sf::Time oneSecondTime = sf::seconds(1);
 sf::Time timePassedSinceLastSecond;
 unsigned int lastFPS, liveFPSCounter;
 
+sf::View gameView; 
+sf::View HUDView;  
+sf::View menuView; 
+
+sf::Vector2f windowSize(1.f,1.f);
+
+sf::Vector2f camCenter; //Thinking strictly, this is redundant, since the center is also contained in the gameView. However, this is always the right vaule, the gameView then gets updated to fit to this. 
+float camZoom = 0.01f; //Considering that with a 1 to 1 zoom every tile was only one pixel big, and this being the factor multiplied to the window size to determine the visible area
+
 sf::RenderWindow * gameWindow;
+sf::RenderTarget * target;
+
+//sf::Vector2f lastMousePos;
+sf::Vector2f mouseDragStart;
+float scrollSinceLastUpdate;
+bool lastFirstDown;
+
+#define BUTTON_SPACE 100.f
+#define BUTTON_INSET 5.f
+#define BUTTON_SIZE BUTTON_SPACE-2*BUTTON_INSET
+
+sf::Font mainFont;
 
 //!If you want to halt, the TPS don't matter, if you don't want to halt, TPS are the requested ticks per second
 void updateGameSpeed(bool halt, float TPS) {
@@ -27,6 +48,64 @@ void updateGameSpeed(bool halt, float TPS) {
         shouldHalt = false;
         nextFrameLength = sf::seconds(1.0f/TPS);
     }
+}
+
+void updateGameView() {
+    gameView.setCenter(camCenter);
+    gameView.setSize(camZoom*windowSize);
+}
+
+void updateViewport(sf::Vector2f newSize) {
+    windowSize = newSize;
+    gameView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
+    updateGameView();
+
+    HUDView = sf::View(sf::FloatRect(0.f, 0.f, newSize.x, newSize.y));
+    HUDView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
+
+    menuView = sf::View(sf::FloatRect(BUTTON_SPACE-newSize.x, 0.f, newSize.x, newSize.y));
+    menuView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
+}
+
+sf::Vector2f getCamCenterSoThatTheMouseMapsTo(float camZoom, sf::Vector2f mouseCenteredOnWindow, sf::Vector2f mouseOnMap) {
+    return mouseOnMap - mouseCenteredOnWindow*camZoom;
+}
+
+//The bad, not deterministic menu handling is here. Totally dependent on the frames, called before every single render. 
+void tick() {
+    if (!gameWindow->hasFocus()) {
+        scrollSinceLastUpdate = 0;
+        return; 
+    }
+    sf::Vector2i local = sf::Mouse::getPosition(*gameWindow);
+    sf::Vector2f mouseCenteredOnWindow = sf::Vector2f(local.x+0.f, local.y+0.f) - windowSize*0.5f;
+    sf::Vector2f mouseOnMap = gameWindow->mapPixelToCoords(local, gameView);
+
+    bool firstDown = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
+    //bool secondDown = sf::Mouse::isButtonPressed(sf::Mouse::Button::Right);
+    float scroll = scrollSinceLastUpdate;
+    
+    if (firstDown) {
+        if (!lastFirstDown) {
+            mouseDragStart = mouseOnMap;
+        } else {
+            camCenter = getCamCenterSoThatTheMouseMapsTo(camZoom, mouseCenteredOnWindow, mouseDragStart);
+            updateGameView();
+        }
+    } else {
+
+    }
+ 
+    if (scrollSinceLastUpdate != 0.0f) {
+        camZoom *= powf(0.8f, scrollSinceLastUpdate);
+        camCenter = getCamCenterSoThatTheMouseMapsTo(camZoom, mouseCenteredOnWindow, mouseOnMap);
+        updateGameView();
+    }
+
+
+    lastFirstDown = firstDown;
+    //lastMousePos = mousePos;
+    scrollSinceLastUpdate = 0;
 }
 
 void update() {
@@ -42,16 +121,54 @@ void update() {
     }
 }
 
+//Screen Coordinates here span from 0 to windowSize.x and 0 to windowSize.y
+void renderHUD() {
+    sf::Text fpsDisplay;
+    fpsDisplay.setFont(mainFont);
+    fpsDisplay.setString(std::to_string(lastFPS));
+    fpsDisplay.setCharacterSize(18);
+    fpsDisplay.setPosition(sf::Vector2f(10.f, 2.f));
+    fpsDisplay.setFillColor(sf::Color::Black);
+    target->draw(fpsDisplay);
+}
+
+//Screen coordinates are scaled so that one button has the size of BUTTON_SPACE, and from origin at top x left
+void renderMenu() {
+    sf::RectangleShape shade(sf::Vector2f(BUTTON_SPACE, windowSize.y));
+    shade.setFillColor(sf::Color(0,0,0,150));
+    target->draw(shade);
+    //Temp of course
+    for (int i = 0; i < 4; i++) {
+        sf::RectangleShape button(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
+        button.setPosition(BUTTON_INSET, BUTTON_INSET + i*BUTTON_SIZE);
+        button.setFillColor(sf::Color::Black);
+        target->draw(button);
+    }
+}
+
 //!Delta 0: Previous frame 100% interpolated, 1 current frame 100% interpolated
 void render(float delta) {
-    gameWindow->clear(sf::Color::White);
+    tick();
+
+    target->setView(gameView);
+    target->clear(sf::Color::White);
     for (auto entity : entities) {
-        entity->draw(*gameWindow, delta);
+        entity->draw(*target, delta);
     }
+
+    target->setView(HUDView);
+    renderHUD();
+    
+    target->setView(menuView);
+    renderMenu();
+
     gameWindow->display();
 }
 
 int main() {
+
+    sf::Vector2i newSize(800, 600);
+
     std::shared_ptr<GameMap> map;
     try {
         map = loadFromFile("maps/defaultMap.txt");
@@ -63,22 +180,29 @@ int main() {
     entities.push_back(map);
 
     entities.push_back(std::make_shared<TestEntity>(0.f,0.f,sf::Color::Black));
-    entities.push_back(std::make_shared<TestEntity>(-150.f,150.f,sf::Color::Red));
-    entities.push_back(std::make_shared<TestEntity>(150.f,200.f,sf::Color::Blue));
-    entities.push_back(std::make_shared<TestEntity>(-200.f,-100.f,sf::Color::Yellow));
-    entities.push_back(std::make_shared<TestEntity>(250.f,-130.f,sf::Color::Green));
-    
+    entities.push_back(std::make_shared<TestEntity>(-3.f,1.f,sf::Color::Red));
+    entities.push_back(std::make_shared<TestEntity>(5.f,2.f,sf::Color::Blue));
+    entities.push_back(std::make_shared<TestEntity>(-10.f,-8.f,sf::Color::Yellow));
+    entities.push_back(std::make_shared<TestEntity>(3.f,-3.f,sf::Color::Green));
+
+    if (!mainFont.loadFromFile("fonts/redline.ttf")) {
+        std::cout << "Could not load font file. ";
+    }
+
     sf::ContextSettings contextSetting;
     contextSetting.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(800,600), "RockRaiders", sf::Style::Default, contextSetting);
+    sf::RenderWindow window(sf::VideoMode(newSize.x,newSize.y), "RockRaiders", sf::Style::Default, contextSetting);
     gameWindow = &window;
+    target = &window; //If we at some point decide to draw into an image instead ... were prepared! 
+
+    updateViewport(sf::Vector2f((float)newSize.x, (float)newSize.y));
 
     // The sf::VideoMode class has some interesting static functions to get the desktop resolution, or the list of valid video modes for fullscreen mode. 
     // Don't hesitate to have a look at its documentation. 
     
     isHalt = true; //Lets don't do any initialization and instead pretend like the game was paused before ... 
     //so all initialization is done by itself in the next update when it is confronted with continuing the loop
-    updateGameSpeed(false, 60);
+    updateGameSpeed(false, 1);
 
     timePassedSinceLastSecond = zeroTime;
 
@@ -89,9 +213,16 @@ int main() {
         while (window.pollEvent(event)) {
             switch (event.type)
             {
+            case sf::Event::Resized:
+                updateViewport(sf::Vector2f((float)event.size.width, (float)event.size.height));
+                break;
             case sf::Event::Closed:
                 window.close();
                 break;
+            case sf::Event::MouseWheelScrolled:
+                if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
+                    scrollSinceLastUpdate += event.mouseWheelScroll.delta;
+                }
             }
         }
         
@@ -130,12 +261,9 @@ int main() {
         while (timePassedSinceLastSecond > oneSecondTime) {
             timePassedSinceLastSecond -= oneSecondTime;
             lastFPS = liveFPSCounter;
-            std::cout << lastFPS << " Frames last second\n";
             liveFPSCounter = 0;
         }
         liveFPSCounter++;
-        
-        //TODO: Find a font, load a font, and write the FPS and current updates
     }
 
     return 0;

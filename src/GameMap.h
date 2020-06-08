@@ -27,7 +27,7 @@ class GameMap : public Entity {
         Block ** map;
         sf::Texture texture; 
         sf::VertexArray renderDataTextures;
-        bool renderDataNeedsToBeUpdatedBeforeNextDraw = false; 
+        bool renderDataNeedsToBeUpdatedBeforeNextDraw = true; 
         
 };
 

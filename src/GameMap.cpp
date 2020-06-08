@@ -21,8 +21,9 @@ GameMap::GameMap(Block ** m, int width, int height, std::string texture) {
     if (!this->texture.loadFromFile(texture)) {
         throw "Could not load texture file " + texture;
     }
+    this->texture.setSmooth(true);
     singleTextureSize = this->texture.getSize().x / TEXTURE_TILES_PER_ROW;
-    renderDataTextures = sf::VertexArray(sf::Quads, width*height);
+    renderDataTextures = sf::VertexArray(sf::Quads, width*height*4);
 }
 int GameMap::getHeight() {
     return height;
@@ -40,13 +41,21 @@ GameMap::~GameMap() {
 void GameMap::updateRenderData() {
     int i = 0;
     for (int x = 0; x < width; x++) {
-        for (int y = 0; y < width; y++) {
+        for (int y = 0; y < height; y++) {
             sf::IntRect textureTile = getTextureRect(map[x][y], singleTextureSize);
 
-            renderDataTextures[i+0].position = sf::Vector2f(x, y);
-            renderDataTextures[i+1].position = sf::Vector2f(x, y);
-            renderDataTextures[i+2].position = sf::Vector2f(x, y);
-            renderDataTextures[i+3].position = sf::Vector2f(x, y);
+            renderDataTextures[i+0].position = sf::Vector2f(x+0.f, y+0.f);
+            renderDataTextures[i+1].position = sf::Vector2f(x+1.f, y+0.f);
+            renderDataTextures[i+2].position = sf::Vector2f(x+1.f, y+1.f);
+            renderDataTextures[i+3].position = sf::Vector2f(x+0.f, y+1.f);
+
+            renderDataTextures[i+0].texCoords = sf::Vector2f(textureTile.left + 0.5f, textureTile.top + 0.5f);
+            renderDataTextures[i+1].texCoords = sf::Vector2f(textureTile.left + textureTile.width - 0.5f, textureTile.top + 0.5f);
+            renderDataTextures[i+2].texCoords = sf::Vector2f(textureTile.left + textureTile.width - 0.5f, textureTile.top + textureTile.height - 0.5f);
+            renderDataTextures[i+3].texCoords = sf::Vector2f(textureTile.left + 0.5f, textureTile.top + textureTile.height - 0.5f);
+
+            i += 4;
+
             //TODO continue this, once I found out how the coordinates are handled in here ...
             //how views can change this
             //and how transforms change this

@@ -31,6 +31,8 @@ int getTextureNumber(Block b) {
         return 16;
     case BUILDING:
         return 16 + 2;    
+    default:
+        return 8*8-1;
     }
 }
 
@@ -39,7 +41,7 @@ int getTextureNumber(Block b) {
 sf::IntRect getTextureRect(Block b, int singleTextureSize) {
     int n = getTextureNumber(b);
     int x = n % TEXTURE_ROWS;
-    int y = x / TEXTURE_ROWS;
+    int y = n / TEXTURE_ROWS;
     return sf::IntRect(x*singleTextureSize, y*singleTextureSize, singleTextureSize, singleTextureSize);
 }
 #endif

@@ -1,6 +1,6 @@
 #include "TestEntity.h"
 #include <SFML/Graphics.hpp>
-#define STEP_SIZE 20 
+#define STEP_SIZE 1 
 
 bool TestEntity::update() {
     lastX = currentX;
@@ -27,7 +27,7 @@ bool TestEntity::update() {
     return false;
 }
 void TestEntity::draw (sf::RenderTarget &target, float delta) {
-    sf::CircleShape circle(30.f);
+    sf::CircleShape circle(0.5f);
     float invDelta = 1.f-delta;
     circle.setFillColor(color);
     circle.setPosition(sf::Vector2f(currentX*delta + lastX*invDelta, currentY*delta + lastY*invDelta));

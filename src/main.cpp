@@ -38,6 +38,11 @@ bool lastFirstDown;
 #define BUTTON_INSET 5.f
 #define BUTTON_SIZE BUTTON_SPACE-2*BUTTON_INSET
 
+//this is closest possible zoom
+#define ZOOM_MIN 0.0025f
+//this is the most distanced possible zoom
+#define ZOOM_MAX 0.5f
+
 sf::Font mainFont;
 
 //!If you want to halt, the TPS don't matter, if you don't want to halt, TPS are the requested ticks per second
@@ -71,6 +76,15 @@ sf::Vector2f getCamCenterSoThatTheMouseMapsTo(float camZoom, sf::Vector2f mouseC
     return mouseOnMap - mouseCenteredOnWindow*camZoom;
 }
 
+//!Caps the camZoom variable if its too small or big
+void capZoom() {
+    if (camZoom < ZOOM_MIN) {
+        camZoom = ZOOM_MIN;
+    } else if (camZoom > ZOOM_MAX) {
+        camZoom = ZOOM_MAX;
+    }
+}
+
 //The bad, not deterministic menu handling is here. Totally dependent on the frames, called before every single render. 
 void tick() {
     if (!gameWindow->hasFocus()) {
@@ -98,6 +112,7 @@ void tick() {
  
     if (scrollSinceLastUpdate != 0.0f) {
         camZoom *= powf(0.8f, scrollSinceLastUpdate);
+        capZoom();
         camCenter = getCamCenterSoThatTheMouseMapsTo(camZoom, mouseCenteredOnWindow, mouseOnMap);
         updateGameView();
     }

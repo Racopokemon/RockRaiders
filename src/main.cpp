@@ -126,7 +126,7 @@ void tick() {
 void update() {
     unsigned int i = 0;
     while (i < entities.size()) {
-        if (entities[i]->update()) {
+        if (entities[i]->update_impl()) {
             //Delete this entity! 
             entities.erase(entities.begin()+i);
         } else {
@@ -213,7 +213,6 @@ int main() {
     updateViewport(sf::Vector2f((float)newSize.x, (float)newSize.y));
 
     // The sf::VideoMode class has some interesting static functions to get the desktop resolution, or the list of valid video modes for fullscreen mode. 
-    // Don't hesitate to have a look at its documentation. 
     
     isHalt = true; //Lets don't do any initialization and instead pretend like the game was paused before ... 
     //so all initialization is done by itself in the next update when it is confronted with continuing the loop

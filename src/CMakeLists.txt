@@ -4,13 +4,22 @@ project(RockRaiders)
 
 set(var_main_sources 
 	main.cpp
-	Entity.h
-	Block.h
+	Entity.cpp
+	Block.cpp
 	GameMap.cpp
 	MapLoader.cpp
-	MapTextureLookup.h
+	BlockPropertiesLookup.cpp
 	CharBlockLookup.h
-	TestEntity.cpp)
+	LocatedEntity.h
+	TestEntity.cpp
+	Graph.cpp
+	Navigation.h
+	World.h
+	JobDoer.cpp
+	Job.cpp
+	Pickup.cpp
+	Worker.h
+	JobPickup.h)
 
 find_package(SFML 2.5.1 COMPONENTS audio
 graphics window system REQUIRED)

@@ -2,7 +2,7 @@
 #include <SFML/Graphics.hpp>
 #define STEP_SIZE 1 
 
-bool TestEntity::update() {
+void TestEntity::update() {
     lastX = currentX;
     lastY = currentY;
     currentX = baseX;
@@ -24,7 +24,6 @@ bool TestEntity::update() {
         currentX -= STEP_SIZE;
         break;
     }
-    return false;
 }
 void TestEntity::draw (sf::RenderTarget &target, float delta) {
     sf::CircleShape circle(0.5f);

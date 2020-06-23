@@ -3,32 +3,48 @@
 
 #include "Entity.h"
 #include "Block.h"
+#include "Graph.h"
 #include <SFML/Graphics.hpp>
+#include "BlockPropertiesLookup.h"
 
 //! Manages the entire map, including the rendering, but also responsible for logic, modification, etc. 
 class GameMap : public Entity {
 
     public : 
-        virtual bool update();
+        virtual void update();
         virtual void draw (sf::RenderTarget &target, float delta);
 
         int getWidth();
         int getHeight();
 
         GameMap(Block ** m, int width, int height, std::string texture);
+
         ~GameMap();
 
-    protected : 
+        std::vector<sf::Vector2u> findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length);
 
-        void updateRenderData();
+    protected : 
 
         int width, height; 
         int singleTextureSize;
         Block ** map;
         sf::Texture texture; 
         sf::VertexArray renderDataTextures;
-        bool renderDataNeedsToBeUpdatedBeforeNextDraw = true; 
-        
+        //!Set to true, this regenerates the vertex data for rendering (redraws the map) on the next draw
+        bool viewModified = true; 
+        //!Set to true, it causes the graph to be regenerated when it is requested the next time
+        bool graphModified = true; 
+        std::shared_ptr<Graph> graph; 
+
+        void updateRenderData();
+        void setModified();
+        std::shared_ptr<Graph> getGraph();
+        void generateGraph();
+
+    private : 
+        bool inBounds(int x, int y);
+        bool isPositionWalkable(int x, int y);
+        void connectIfFree(Graph g, sf::Vector2i start, sf::Vector2i* pos, int listSize, bool onlyAverageFirstAndLast);
 };
 
 #endif

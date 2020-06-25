@@ -12,7 +12,7 @@ void GameMap::draw (sf::RenderTarget &target, float delta) {
     target.draw(renderDataTextures, &texture);
 
     //TEMP 4 testing only
-    sf::Color col = sf::Color(128,128,128,40);
+    sf::Color col = sf::Color(255,255,255,100);
     auto g = getGraph();
     std::vector<sf::Vertex> vlist;
     for (int x = 0; x < width; x++) {
@@ -36,7 +36,7 @@ GameMap::GameMap(Block ** m, int width, int height, std::string texture) {
     if (!this->texture.loadFromFile(texture)) { 
         throw "Could not load texture file " + texture; 
     } 
-    this->texture.setSmooth(true); 
+    //this->texture.setSmooth(true); 
     singleTextureSize = this->texture.getSize().x / TEXTURE_TILES_PER_ROW; 
     renderDataTextures = sf::VertexArray(sf::Quads, width*height*4); 
 } 

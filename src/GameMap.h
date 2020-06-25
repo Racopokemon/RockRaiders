@@ -21,8 +21,24 @@ class GameMap : public Entity {
 
         ~GameMap();
 
-        std::vector<sf::Vector2u> findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length);
+        std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length);
 
+        //!-1 means that there doesn't exist a path. Just calls findPathBetween. 
+        int getPathLength(sf::Vector2i start, sf::Vector2i target);
+        //! True if target can be reached from start. Just calls getPathLength.
+        bool connected(sf::Vector2i start, sf::Vector2i target);
+        //!see the other connected() function.
+        bool connected(sf::Vector2f start, sf::Vector2f target);
+
+        int getMovementSpeed(sf::Vector2i pos);
+
+        //The time is consistent, but it is not per second or anything - but für navigation this is enough. 
+        int getMovementTime(sf::Vector2i pos);
+
+        bool isPositionWalkable(sf::Vector2i pos);
+
+        //!Obvoiusly this is only for quick debugging purposes. 
+        sf::Vector2i getRandomPosition();
     protected : 
 
         int width, height; 
@@ -44,7 +60,7 @@ class GameMap : public Entity {
     private : 
         bool inBounds(int x, int y);
         bool isPositionWalkable(int x, int y);
-        void connectIfFree(Graph g, sf::Vector2i start, sf::Vector2i* pos, int listSize, bool onlyAverageFirstAndLast);
+        void connectIfFree(Graph & g, sf::Vector2i start, sf::Vector2i* pos, int listSize, bool onlyAverageFirstAndLast);
 };
 
 #endif

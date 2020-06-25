@@ -35,8 +35,8 @@ sf::IntRect getTextureRect(Block b, int singleTextureSize) {
 }
 
 #define SPEED_DEFAULT 100
-#define SPEED_RUBBLE 30
-#define SPEED_PLATE 140
+#define SPEED_RUBBLE 33
+#define SPEED_PLATE 170
 
 int getBlockMovementSpeed(Block b) {
     switch (b.getBlockType())

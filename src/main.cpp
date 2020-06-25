@@ -1,13 +1,15 @@
-#include <iostream>
+#include "main.h"
 
+#include <iostream>
 //#include "SFML/Window.hpp"
 #include "SFML/Graphics.hpp"
 #include <SFML/System.hpp>
-#include "MapLoader.h"
 #include "TestEntity.h"
+#include "World.h"
+#include "LocatedEntity.h" //Temp actually
 
 std::vector<std::shared_ptr<Entity>> entities;
-GameMap * map;
+std::shared_ptr<World> world; 
 
 bool isHalt, shouldHalt;
 sf::Time currentFrameLength, nextFrameLength, timePassedSinceFrameStart;
@@ -156,7 +158,7 @@ void renderMenu() {
     for (int i = 0; i < 4; i++) {
         sf::RectangleShape button(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
         button.setPosition(BUTTON_INSET, BUTTON_INSET + i*BUTTON_SIZE);
-        button.setFillColor(sf::Color::Black);
+        button.setFillColor(sf::Color::White);
         target->draw(button);
     }
 }
@@ -166,7 +168,7 @@ void render(float delta) {
     tick();
 
     target->setView(gameView);
-    target->clear(sf::Color::White);
+    target->clear(sf::Color::Black);
     for (auto entity : entities) {
         entity->draw(*target, delta);
     }
@@ -180,25 +182,17 @@ void render(float delta) {
     gameWindow->display();
 }
 
+const std::vector<std::shared_ptr<Entity>> getEntities() {
+    return entities;
+}
+
+void addEntity(std::shared_ptr<Entity> entity) {
+    entities.push_back(entity);
+}
+
 int main() {
 
     sf::Vector2i newSize(800, 600);
-
-    std::shared_ptr<GameMap> map;
-    try {
-        map = loadFromFile("maps/defaultMap.txt");
-    } catch (std::exception& e) {
-        std::cout << "Loading the file failed. ";
-        std::cout << e.what();
-        exit(-1);
-    }
-    entities.push_back(map);
-
-    entities.push_back(std::make_shared<TestEntity>(0.f,0.f,sf::Color::Black));
-    entities.push_back(std::make_shared<TestEntity>(-3.f,1.f,sf::Color::Red));
-    entities.push_back(std::make_shared<TestEntity>(5.f,2.f,sf::Color::Blue));
-    entities.push_back(std::make_shared<TestEntity>(-10.f,-8.f,sf::Color::Yellow));
-    entities.push_back(std::make_shared<TestEntity>(3.f,-3.f,sf::Color::Green));
 
     if (!mainFont.loadFromFile("fonts/redline.ttf")) {
         std::cout << "Could not load font file. ";
@@ -207,16 +201,22 @@ int main() {
     sf::ContextSettings contextSetting;
     contextSetting.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(newSize.x,newSize.y), "RockRaiders", sf::Style::Default, contextSetting);
+    window.setKeyRepeatEnabled(false);
     gameWindow = &window;
     target = &window; //If we at some point decide to draw into an image instead ... were prepared! 
 
     updateViewport(sf::Vector2f((float)newSize.x, (float)newSize.y));
 
     // The sf::VideoMode class has some interesting static functions to get the desktop resolution, or the list of valid video modes for fullscreen mode. 
+    World * w = new World("maps/defaultMap.txt");
+    world = w->ref();
+
+    camCenter = sf::Vector2f(world->getMap()->getWidth()*0.5f, world->getMap()->getHeight()*0.5f);
+    updateGameView();
     
     isHalt = true; //Lets don't do any initialization and instead pretend like the game was paused before ... 
     //so all initialization is done by itself in the next update when it is confronted with continuing the loop
-    updateGameSpeed(false, 1);
+    updateGameSpeed(false, 60);
 
     timePassedSinceLastSecond = zeroTime;
 
@@ -237,6 +237,33 @@ int main() {
                 if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
                     scrollSinceLastUpdate += event.mouseWheelScroll.delta;
                 }
+                break;
+            case sf::Event::KeyPressed:
+                if (event.key.code == sf::Keyboard::Num1) {
+                    updateGameSpeed(true, 60);
+                }
+                if (event.key.code == sf::Keyboard::Num2) {
+                    updateGameSpeed(false, 4);
+                }
+                if (event.key.code == sf::Keyboard::Num3) {
+                    updateGameSpeed(false, 10);
+                }
+                if (event.key.code == sf::Keyboard::Num4) {
+                    updateGameSpeed(false, 25);
+                }
+                if (event.key.code == sf::Keyboard::Num5) {
+                    updateGameSpeed(false, 60);
+                }
+                if (event.key.code == sf::Keyboard::Num6) {
+                    updateGameSpeed(false, 100);
+                }
+                if (event.key.code == sf::Keyboard::Num7) {
+                    updateGameSpeed(false, 250);
+                }
+                if (event.key.code == sf::Keyboard::Num8) {
+                    updateGameSpeed(false, 500);
+                }
+                break; 
             }
         }
         
@@ -282,49 +309,3 @@ int main() {
 
     return 0;
 }
-
-
-
-
-/**
- * Todo: 
- * 
- * --Create a main function and write into the console. Might be harder than I think. 
- * 
- * Lets see a window and handle its events
- * (is there a *fullscreen???*)
- * 
- * create a texture and a sprite and draw both. 
- * Dive into the docs. Can I paint the texture from emptiness? 
- * Measure the time and write some fps into the corner 
- * find out if SFML wants doubles or floats
- * find out about transforms included in the renderer (then I don't have to pass this argument, but how do I check whether I'm in bounds? <-- included? )
- * can I already use sf::transform to shift all my stuff around at the same time? <-- ezezez it returns a "transform" (3x3 mat oh surprise) and we can .transform points, but also 
- *      just multiply all our vectors to it, simple does it
- * 
- * Dive deep into the view stuff [which really is just another transform with other parameters]
- * Undertand how you should be able to do several at once, if they fit for menus etc, if they rescale on window resize, ...
- * Maybe later I'd also like to have some 3D effects like fog in the foreground or water furtehr back. 
- * 
-    sf::RenderStates states;
-    states.transform = transform;
-    window.draw(entity, states);
- * 
- * either way also find out about matrices in sflm
- * create the .h and .cpp file for a Renderable: 
- *      render(transform (?) , double/float timestep, renderer))
- * 
- * https://www.sfml-dev.org/tutorials/2.5/graphics-vertex-array.php#what-is-a-vertex-and-why-are-they-always-in-arrays
- * they LITERALLY generate a map (in a very fast manner) in this data structure. Oof. Okay lets dig right into it and copy this as well. 
- * 
- * Lol and they even contribute a particle system as well. Okay looks like 
- * 
- * 
- * next things to consider: Do we already have anti-alias on? If not <--- yeeah baby turn it ooohn (~Lucio, on E, always)
- * 
- * map (renderable)
- * 
- * later on we also need a Tickable
- * 
- * Make a basic renderable class / interface and render a bouncy thingy with interpolation and timer and everything
- */

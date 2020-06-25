@@ -27,14 +27,14 @@
             sf::Transform trans;
             trans.translate(position*delta + lastPosition*invDelta);
             trans.rotate(rotation*delta + lastRotation*invDelta);
-            draw(sf::RenderStates(trans), delta, invDelta);
+            draw(target, sf::RenderStates(trans), delta, invDelta);
         }
 
         /*!For the main purposes it succeeds to implement this draw method instead of the one from Entity: 
         * If you use the given RenderStates to draw, this already applies the right interpolated transformation so that you can 
         * assume the center of the LocatedEntity to be at 0,0
         */ 
-        virtual void draw(sf::RenderStates states, float delta, float invDelta) = 0;
+        virtual void draw(sf::RenderTarget &target, sf::RenderStates states, float delta, float invDelta) = 0;
 
         /*!If you choose not to interpolate, then the LocatedEntity starts interpolating from the given position (we update the lastPosition variable)
          * If you change the position afterwards, it interpolates to this new, changed position
@@ -54,7 +54,7 @@
         }
         virtual void moveForward(float amount) {
             float rotationInRadians = rotation / 180 * PI;
-            changePosition(sf::Vector2f(amount * sinf(rotationInRadians), amount * cosf(rotationInRadians)));
+            changePosition(sf::Vector2f(amount * sinf(rotationInRadians), amount * -cosf(rotationInRadians)));
         }
 
         //!Just a helper to keep the rotation value in the bounds from (-180, 180]. The trick is to also update the lastRotation value to not affect the interpolation. 
@@ -127,11 +127,52 @@
             rotation = destinationRotation;
         }
 
+        //!Returns the angle (in degrees, of course) of the given vector (so that it fits in our coordinate concept)
+        static float pointAtAngle(sf::Vector2f diff) {
+            return atan2(diff.x, -diff.y) / PI * 180.f;
+        }
+        //!Returns the angle (in degrees, of course) of the given vector (so that it fits in our coordinate concept)
+        static float pointAtAngle(sf::Vector2f from, sf::Vector2f pointingAt) {
+            return pointAtAngle(pointingAt-from);
+        }
+
+        //... well-known from Scratch xD
+        void pointAt(sf::Vector2f target) {
+            rotateTo(pointAtAngle(position, target), nearest);
+        }
+
+        //!Points at the target and moves forward to it by the given value. 
+        //The clue: If we reach the target and possibly step even over it, not the whole
+        //motion is applied but we end just exactly on the target. 
+        //Returns true in exactly the case that we reached the target. 
+        bool moveForwardTo(sf::Vector2f target, float distance) {
+            pointAt(target);
+            sf::Vector2f diff = target - position;
+            if (hypotf(diff.x, diff.y) <= distance) {
+                setPosition(target, true);
+                return true; 
+            } else {
+                moveForward(distance);
+                return false;
+            }
+        }
+
         virtual void prepareDeletion() {Entity::prepareDeletion();};
 
         sf::Vector2i getTile() {
             return toTile(position);
         }
+
+        static sf::Vector2f getTileCenter(sf::Vector2i v) {
+            return sf::Vector2f(v.x + 0.5f, v.y + 0.5f);
+        }
+        
+        bool insideInnerTile(sf::Vector2i pos, float distance) {
+            sf::Vector2f p = getPosition();
+            sf::Vector2f tile = getTileCenter(pos);
+            return abs(p.x-tile.x) <= distance && abs(p.y-tile.y) <= distance;
+        }
+
 
     private : 
         //!The rotation values are stored in degrees, for convenience

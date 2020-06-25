@@ -4,6 +4,7 @@
 
 #include "Graph.h"
 #include "SFML/Graphics.hpp"
+#include <iostream>
 
 #define HIGHEST_UNSIGNED_INT ~0u
 
@@ -16,10 +17,10 @@ struct DijkstraData {
     //bool insideR = false; //!The set R is empty when the algorithm starts and is expanded during the execution. For all nodes in R we already determined the shortest path
     //This should hopefully work and become the biggest possible integer number (close enough to infinity)
     unsigned int l = HIGHEST_UNSIGNED_INT; //!Minimal known distance to this node. 
-    sf::Vector2u p; //!Pointer to previous node on shortest path
+    sf::Vector2i p; //!Pointer to previous node on shortest path
 };
 
-unsigned int getNodeDataIndex(sf::Vector2u v, int width) {
+unsigned int getNodeDataIndex(sf::Vector2i v, int width) {
     return v.x+v.y*width;
 }
 
@@ -28,7 +29,7 @@ unsigned int getNodeDataIndex(sf::Vector2u v, int width) {
  * therefore we need to know width and height of the grid graph)
  * Returns a path starting with start node and ending with target note. If there is no path, we return an empty vector. 
  */
-std::vector<sf::Vector2u> dijkstra(Node * start, Node * target, int gridWidth, int gridHeight,int & length) {
+std::vector<sf::Vector2i> dijkstra(Node * start, Node * target, int gridWidth, int gridHeight,int & length) {
     //R is empty
     //Distances are infinity
     std::unique_ptr<DijkstraData[]> data(new DijkstraData[gridWidth*gridHeight]);
@@ -58,17 +59,18 @@ std::vector<sf::Vector2u> dijkstra(Node * start, Node * target, int gridWidth, i
             //We found a shortest path to the destination node. 
             //Trace back the path. 
             length = minValue; 
-            std::vector<sf::Vector2u> pathBackwards;
+            std::vector<sf::Vector2i> pathBackwards;
             unsigned int currentIndex = targetIndex;
             while (currentIndex != startIndex) {
                 pathBackwards.push_back(data[currentIndex].referenceToNode->getPosition());
+                currentIndex = getNodeDataIndex(data[currentIndex].p, gridWidth);
             }
             pathBackwards.push_back(start->getPosition());
             //Flip the path (we went through it from the back)
-            std::vector<sf::Vector2u> pathForward(pathBackwards.size());
+            std::vector<sf::Vector2i> pathForward;
             while (!pathBackwards.empty()) {
                 pathForward.push_back(pathBackwards.back());
-                pathForward.pop_back();
+                pathBackwards.pop_back();
             }
             return pathForward;
         }
@@ -92,7 +94,7 @@ std::vector<sf::Vector2u> dijkstra(Node * start, Node * target, int gridWidth, i
     }
     //If we leave the big while loop without discovering any path to the target,
     //than start and target are not connected. In this case we just return the nullptr
-    return std::vector<sf::Vector2u>(); 
+    return std::vector<sf::Vector2i>(); 
 }
 
 #endif

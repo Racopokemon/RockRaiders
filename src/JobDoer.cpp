@@ -3,6 +3,7 @@
 #include "Pickup.h"
 #include "World.h"
 #include "Job.h"
+#include "GameMap.h"
 
 #define JOB_DOER_BUSY state != idle && state != waiting
 
@@ -30,15 +31,17 @@ void JobDoer::update() {
         if (followPath()) {
             starting = true;
             if (job) {
-                job->onActionFinished(); 
                 state = waiting; 
+                job->onActionFinished(); 
             } else {
+                //in case the job was cancelled. 
                 state = idle;
             }
         }
     } else if (state == animation) {
         if (starting) {
             starting = false; 
+            animationName = nextAnimationName;
             initAnimation();
         }
         if (updateAnimation()) {
@@ -48,8 +51,9 @@ void JobDoer::update() {
                 drop();
             }
             if (job) {
-                job->onActionFinished(); 
                 state = waiting; 
+                job->onActionFinished(); 
+                //in case the job was cancelled. 
             } else {
                 state = idle;
             }
@@ -81,6 +85,11 @@ void JobDoer::setJob(std::shared_ptr<Job> j) {
     job = j;
     job->onJobStarted(std::dynamic_pointer_cast<JobDoer>(ref()));
 }
+
+void printVector(sf::Vector2i v) {
+    std::cout << v.x << ", " << v.y << std::endl;
+}
+
 void JobDoer::walkTo(sf::Vector2f v) {
     if (JOB_DOER_BUSY) {
         throw std::runtime_error("WalkTo called on JobDoer, that was still busy with another task");
@@ -89,12 +98,11 @@ void JobDoer::walkTo(sf::Vector2f v) {
     starting = true; 
     pathEnd = v;
     int i;
-    auto path = world->getMap()->findPathBetween(getTile(), toTile(v), i);
+    path = world->getMap()->findPathBetween(getTile(), toTile(v), i);
     if (path.empty()) {
         std::cout << "THIS IS AN ERROR! There was no path found to the destination of the JobDoer. Therefore the jobDoer is actually not able to perform the Job and cancels it now!" << std::endl;
         cancelJobByUser();
     }
-    path.pop_back();
 }
 void JobDoer::playAnimation(std::string s) {
     if (JOB_DOER_BUSY) {
@@ -103,7 +111,7 @@ void JobDoer::playAnimation(std::string s) {
     state = animation;
     starting = true;
     dropOnAnimationEnd = false; 
-    animationName = s;
+    nextAnimationName = s;
 }
 void JobDoer::pickUpAnimation(std::shared_ptr<Pickup> p) {
     if (JOB_DOER_BUSY) {
@@ -112,7 +120,7 @@ void JobDoer::pickUpAnimation(std::shared_ptr<Pickup> p) {
     state = animation;
     starting = true;
     dropOnAnimationEnd = false; 
-    animationName = "pickup";
+    nextAnimationName = "pickup";
     pickUp(p);
 }
 //!Inits animation "drop" and afterwards drop()s the Pickup.
@@ -123,7 +131,7 @@ void JobDoer::dropAnimation() {
     state = animation;
     starting = true;
     dropOnAnimationEnd = true; 
-    animationName = "drop";
+    nextAnimationName = "drop";
 }
 void JobDoer::onJobFinished() {
     if (state == waiting || state == idle) {

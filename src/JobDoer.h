@@ -38,7 +38,8 @@ class JobDoer : public LocatedEntity {
         //!Place for individual motion styles, using your own variables. 
         //Don't move here yet, the first followPath() call comes directly after! 
         virtual void initPath() = 0;
-        //!!Place for individual motion styles, called in every update. 
+        //!!Place for individual motion styles, called in every update. The path is already calculated and stored in
+        //path, starting with the current tile and ending at the target tile, pathEnd is the precise position on the target tile. 
         //True means the following has ended and were up to do the next thing a job wants us to do. 
         //Maybe call isJobCancelled() every now and then, in this case you should directly stop walking your path. 
         virtual bool followPath() = 0;
@@ -88,14 +89,20 @@ class JobDoer : public LocatedEntity {
         
         bool isJobCancelled(); 
 
+        //Name of the animation that is currently executed. This indeed MAY be accessed during rendering (path and pathEnd not). 
         std::string animationName;
+        //!If we should only move on the tile, the current tile is still inside the path. 
+        //In the last frame of an animation or motion, this might change already, so DONT USE THIS FOR RENDERING,
+        //save your own copy / states instead.  
         std::vector<sf::Vector2i> path;
+        //Should also not be accessed for rendering, see path variable. 
         sf::Vector2f pathEnd; 
     private :
         bool jobCancelled; 
         JobDoerState state = idle; 
         bool starting = true; 
         bool dropOnAnimationEnd = false; 
+        std::string nextAnimationName; 
 };
 
 #endif

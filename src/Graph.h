@@ -21,7 +21,7 @@ class Node {
 
     public :
         Node() {};
-        Node(sf::Vector2u pos) {
+        Node(sf::Vector2i pos) {
             position = pos;
         }
         void addEdge(Edge e) {
@@ -30,12 +30,12 @@ class Node {
         std::vector<Edge> getEdges() {
             return edges; 
         }
-        sf::Vector2u getPosition() {
+        sf::Vector2i getPosition() {
             return position; 
         }
 
     private :
-        sf::Vector2u position;
+        sf::Vector2i position;
         std::vector<Edge> edges; 
         
 };
@@ -46,11 +46,11 @@ class Graph {
         Graph(int w, int h); 
         ~Graph();
         //!No bound check is done here. 
-        Node * getNode(sf::Vector2u pos);
-        void connect(sf::Vector2u a, sf::Vector2u b, unsigned int weight);
+        Node * getNode(sf::Vector2i pos);
+        void connect(sf::Vector2i a, sf::Vector2i b, unsigned int weight);
         //!Returns a vector of positions that lead from start to target, first element is start, last element is target. 
-        //If the vector is empty, no path was found. 
-        std::vector<sf::Vector2u> findPathBetween(sf::Vector2u start, sf::Vector2u target, int & length);
+        //If the vector is empty, no path was found. In this case length is not changed. 
+        std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length);
     private : 
         int width = 0, height = 0;
         Node * nodes; 

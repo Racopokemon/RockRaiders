@@ -4,28 +4,29 @@
 
 void GameMap::update() {}
 
-void GameMap::draw (sf::RenderTarget &target, float delta) {
+void GameMap::draw (sf::RenderTarget &target, float delta, bool debug) {
     if (viewModified) {
         viewModified = false;
         updateRenderData();
     }
     target.draw(renderDataTextures, &texture);
 
-    //TEMP 4 testing only
-    sf::Color col = sf::Color(255,255,255,100);
-    auto g = getGraph();
-    std::vector<sf::Vertex> vlist;
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-            Node * n = g->getNode(sf::Vector2i(x,y));
-            for (Edge e : n->getEdges()) {
-                sf::Vector2i vec = e.target->getPosition();
-                vlist.push_back(sf::Vertex(sf::Vector2f(vec.x + 0.5f, vec.y + 0.5f), col));
-                vlist.push_back(sf::Vertex(sf::Vector2f(x + 0.5f, y + 0.5f), col));
+    if (debug) {
+        sf::Color col = sf::Color(255,255,255,100);
+        auto g = getGraph();
+        std::vector<sf::Vertex> vlist;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                Node * n = g->getNode(sf::Vector2i(x,y));
+                for (Edge e : n->getEdges()) {
+                    sf::Vector2i vec = e.target->getPosition();
+                    vlist.push_back(sf::Vertex(sf::Vector2f(vec.x + 0.5f, vec.y + 0.5f), col));
+                    vlist.push_back(sf::Vertex(sf::Vector2f(x + 0.5f, y + 0.5f), col));
+                }
             }
         }
+        target.draw(&vlist[0], vlist.size(), sf::Lines);
     }
-    target.draw(&vlist[0], vlist.size(), sf::Lines);
 }
 
 GameMap::GameMap(Block ** m, int width, int height, std::string texture) {
@@ -51,6 +52,10 @@ GameMap::~GameMap() {
         delete[height] map[i];
     }
     delete[width] map; 
+}
+
+bool GameMap::inMapBounds(sf::Vector2i pos) {
+    return inBounds(pos.x, pos.y);
 }
 
 void GameMap::generateGraph() {
@@ -192,6 +197,23 @@ void GameMap::setModified() {
 
 sf::Vector2i GameMap::getRandomPosition() {
     return sf::Vector2i(rand()%width, rand()%height);
+}
+
+//!why didnt I write this way earlier..
+Block & GameMap::getBlock(sf::Vector2i pos) {
+    return map[pos.x][pos.y];
+}
+
+bool GameMap::isBreakableWall(sf::Vector2i pos) {
+    return getBlock(pos).isBreakableWall();
+}
+
+bool GameMap::isGeneralWall(sf::Vector2i pos) {
+    return getBlock(pos).isGeneralWall();
+}
+
+bool GameMap::getWallStrength(sf::Vector2i pos) {
+    return getBlock(pos).getWallStrength();
 }
 
 

@@ -67,14 +67,22 @@ struct Block {
         void setRubbleAmount(int const amount) {
             metaA = amount; 
         }
-        //! Makes only sense for rubble of course
+        //!Makes only sense for rubble of course
         void setOreAmount(int const amount) {
             metaB = amount; 
         }
-        //!True if this is some kind of ground block that entities can walk on
+        //!True if this is some kind of ground block that entities can walk on.
         bool isWalkable();
         
         int getMovementSpeed();
+
+        //!Checks if the given position is a *breakable* wall block.
+        bool isBreakableWall();
+
+        //!Checks if the given position is any type of wall block.
+        bool isGeneralWall();
+
+        int getWallStrength();
 };
 
 #endif

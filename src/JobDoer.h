@@ -7,6 +7,9 @@ class Pickup;
 class World;
 #include "LocatedEntity.h"
 
+#define ANIMATION_DROP "drop"
+#define ANIMATION_PICKUP "pickup"
+
 class JobDoer : public LocatedEntity {
     public : 
         //!But don't use this except for default placeholder initializations.
@@ -25,10 +28,12 @@ class JobDoer : public LocatedEntity {
         //Things Jobs tell us to do
 
         void walkTo(sf::Vector2f v);
-        void playAnimation(std::string s);
-        //!Instantly picks up the Pickup and inits animation "pickup"
+        //!Depending on the animation name, you can pass additional information with the data pointer 
+        //(that is then known by you and the JobDoer). Put the data on the heap, we might only read it later.
+        void playAnimation(std::string s, void * data = nullptr);
+        //!Instantly picks up the Pickup and inits animation ANIMATION_PICKUP
         void pickUpAnimation(std::shared_ptr<Pickup> p);
-        //!Inits animation "drop" and afterwards drop()s the Pickup.
+        //!Inits animation ANIMATION_DROP and afterwards drop()s the Pickup.
         void dropAnimation();
         void onJobFinished();
         //!Extension to onJobFinished, where we instantly get a new Job assigned instead of asking the World for it
@@ -43,7 +48,9 @@ class JobDoer : public LocatedEntity {
         //True means the following has ended and were up to do the next thing a job wants us to do. 
         //Maybe call isJobCancelled() every now and then, in this case you should directly stop walking your path. 
         virtual bool followPath() = 0;
-        //!Place for individual animations, using your own variables. The name of the animation is written to animationName
+        //!Place for individual animations, using your own variables. The name of the animation is written to animationName,
+        //further custom animation data is contained in animationData. Make sure to *delete* it at the end of the animation, 
+        //best practice would be to delete it right in here! 
         //Don't animate here yet, the first updateAnimation() call comes directly after! 
         virtual void initAnimation() = 0;
         //!!Place for individual animations, called in every update. 
@@ -95,8 +102,11 @@ class JobDoer : public LocatedEntity {
         //In the last frame of an animation or motion, this might change already, so DONT USE THIS FOR RENDERING,
         //save your own copy / states instead.  
         std::vector<sf::Vector2i> path;
-        //Should also not be accessed for rendering, see path variable. 
+        //QShould also not be accessed for rendering, see path variable. 
         sf::Vector2f pathEnd; 
+
+        //!On heap, delete this within this animation ... I suggest doing it directly in initAnimation. 
+        void* animationData;
     private :
         bool jobCancelled; 
         JobDoerState state = idle; 

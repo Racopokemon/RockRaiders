@@ -12,6 +12,7 @@ class Job;
 #include "Job.h"
 #include "JobDoer.h"
 #include "GameMap.h"
+class TileJobs;
 #include <list>
 
 /**
@@ -41,6 +42,12 @@ class World {
         //Remove the Pickup (Dropped in some storage)
         void pickupDropped(std::shared_ptr<Pickup> p);
 
+        //!We still receive the float position, because this allows us e.g. to specify the exact position for workers to navigate to
+        void onTileClicked(sf::Vector2f pos);
+
+        TileJobs * getTileJobs();
+
+
         GameMap * getMap();
 
         std::shared_ptr<World> ref();
@@ -55,6 +62,8 @@ class World {
         std::shared_ptr<GameMap> map; 
         std::list<std::shared_ptr<Job>> jobList; 
 
+        std::unique_ptr<TileJobs> tileJobs;
+        
         std::shared_ptr<World> reference;
 };
 

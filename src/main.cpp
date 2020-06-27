@@ -31,8 +31,11 @@ float camZoom = 0.01f; //Considering that with a 1 to 1 zoom every tile was only
 sf::RenderWindow * gameWindow;
 sf::RenderTarget * target;
 
+bool debugMode = false; 
+
 //sf::Vector2f lastMousePos;
 sf::Vector2f mouseDragStart;
+sf::Vector2i mouseDragStartOnScreen;
 float scrollSinceLastUpdate;
 bool lastFirstDown;
 
@@ -46,6 +49,14 @@ bool lastFirstDown;
 #define ZOOM_MAX 0.5f
 
 sf::Font mainFont;
+
+void onMapClicked(sf::Vector2f pos) {
+    //Here we might first check whether there was an entity that we clicked. 
+    sf::Vector2i tilePos = LocatedEntity::toTile(pos);
+    if (world->getMap()->inMapBounds(tilePos)) {
+        world->onTileClicked(pos);
+    }
+}
 
 //!If you want to halt, the TPS don't matter, if you don't want to halt, TPS are the requested ticks per second
 void updateGameSpeed(bool halt, float TPS) {
@@ -104,12 +115,18 @@ void tick() {
     if (firstDown) {
         if (!lastFirstDown) {
             mouseDragStart = mouseOnMap;
+            mouseDragStartOnScreen = local;
         } else {
             camCenter = getCamCenterSoThatTheMouseMapsTo(camZoom, mouseCenteredOnWindow, mouseDragStart);
             updateGameView();
         }
     } else {
-
+        if (lastFirstDown) {
+            //Released mouse - if we didn't move the mouse, this was a click! 
+            if (mouseDragStartOnScreen == local) {
+                onMapClicked(mouseOnMap);
+            }
+        }
     }
  
     if (scrollSinceLastUpdate != 0.0f) {
@@ -145,7 +162,7 @@ void renderHUD() {
     fpsDisplay.setString(std::to_string(lastFPS));
     fpsDisplay.setCharacterSize(18);
     fpsDisplay.setPosition(sf::Vector2f(10.f, 2.f));
-    fpsDisplay.setFillColor(sf::Color::Black);
+    fpsDisplay.setFillColor(sf::Color::White);
     target->draw(fpsDisplay);
 }
 
@@ -170,7 +187,7 @@ void render(float delta) {
     target->setView(gameView);
     target->clear(sf::Color::Black);
     for (auto entity : entities) {
-        entity->draw(*target, delta);
+        entity->draw(*target, delta, debugMode);
     }
 
     target->setView(HUDView);
@@ -239,11 +256,14 @@ int main() {
                 }
                 break;
             case sf::Event::KeyPressed:
+                if (event.key.code == sf::Keyboard::Space) {
+                    debugMode = !debugMode;
+                }
                 if (event.key.code == sf::Keyboard::Num1) {
                     updateGameSpeed(true, 60);
                 }
                 if (event.key.code == sf::Keyboard::Num2) {
-                    updateGameSpeed(false, 4);
+                    updateGameSpeed(false, 3);
                 }
                 if (event.key.code == sf::Keyboard::Num3) {
                     updateGameSpeed(false, 10);

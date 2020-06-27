@@ -14,7 +14,7 @@ class JobWalk : public Job {
             return world->getMap()->connected(jd->getPosition(), target);
         }
 
-        virtual void onActionFinished() {
+        virtual void onActionFinished(int callNumber) {
             if (!nextActionIsFinish) {
                 doer->walkTo(target);
                 nextActionIsFinish = true;

@@ -6,6 +6,8 @@
 #include "SFML/Graphics.hpp"
 #include "Worker.h"
 #include "JobWalk.h"
+#include "TileJobs.h"
+#include "JobDrill.h"
 
 World::World(std::string mapName) {
     reference = std::shared_ptr<World>(this);
@@ -17,15 +19,16 @@ World::World(std::string mapName) {
         exit(-1);
     }
     addEntity(map);
-    srand(42069);
-    for (int i = 0; i < 20; i++) {
+    tileJobs = std::make_unique<TileJobs>(map->getWidth(), map->getHeight());
+    srand(1337);
+    for (int i = 0; i < 28; i++) {
         sf::Vector2i pos = map->getRandomPosition();
         if (map->isPositionWalkable(pos)) {
             Worker * w = new Worker(ref(), LocatedEntity::getTileCenter(pos));
             addEntity(w->ref());
         }
     }
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < 50; i++) {
         sf::Vector2i pos = map->getRandomPosition();
         if (map->isPositionWalkable(pos)) {
             sf::Vector2f dest = sf::Vector2f(pos.x, pos.y);
@@ -66,6 +69,28 @@ void World::removeJobFromList(std::shared_ptr<Job> j) {
     } else {
         jobList.erase(it);
     }
+}
+
+//!We still receive the float position, because this allows us e.g. to specify the exact position for workers to navigate to
+void World::onTileClicked(sf::Vector2f pos) {
+    //This is very ... ... very temp. 
+    sf::Vector2i t = LocatedEntity::toTile(pos);
+    if (map->isPositionWalkable(t)) {
+        JobWalk * j = new JobWalk(world, pos);
+        addJobToList(j->ref());
+    } else if (map->isBreakableWall(t)) {
+        if (tileJobs->getJobDrill(t)) {
+            tileJobs->cancelJobDrillBySystem(t);
+        } else {
+            JobDrill * jd = new JobDrill(ref(), t);
+            tileJobs->setJobDrill(t, std::dynamic_pointer_cast<JobDrill>(jd->ref()));
+            addJobToList(jd->ref());
+        }
+    }
+}
+
+TileJobs * World::getTileJobs() {
+    return tileJobs.get();
 }
 
         //! Every Pickup that is ever dropped on the ground (also when newly created) calls this.

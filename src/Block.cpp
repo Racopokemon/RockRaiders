@@ -9,3 +9,15 @@ bool Block::isWalkable() {
 int Block::getMovementSpeed() {
     return getBlockMovementSpeed(*this);
 }
+
+bool Block::isBreakableWall() {
+    return isBlockBreakableWall(*this);
+}
+
+bool Block::isGeneralWall() {
+    return isBlockGeneralWall(*this);
+}
+
+int Block::getWallStrength() {
+    return getBlockWallStrength(*this);
+}

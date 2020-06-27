@@ -5,6 +5,8 @@
 #include <SFML/Graphics.hpp>
 #include "World.h"
 
+#define ANIMATION_DRILL "drill"
+
 class Worker : public JobDoer {
     public : 
         Worker(std::shared_ptr<World> w, sf::Vector2f spawnPos);
@@ -16,7 +18,7 @@ class Worker : public JobDoer {
         virtual void initIdle();
         virtual void idleAnimation();
 
-        void draw(sf::RenderTarget &target, sf::RenderStates states, float delta, float invDelta);
+        void draw(sf::RenderTarget &target, sf::RenderStates states, float delta, float invDelta, bool debug);
     protected :
         //Index of the tile we are currently heading at
         //Once this int is the size (yes the size, not size-1) of the path vector, 
@@ -26,6 +28,8 @@ class Worker : public JobDoer {
 
         int animationFrame;
         int animationLength;
+
+        bool animationPlaying = false; 
 };
 
 #endif

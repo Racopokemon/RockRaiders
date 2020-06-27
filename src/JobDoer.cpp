@@ -104,7 +104,7 @@ void JobDoer::walkTo(sf::Vector2f v) {
         cancelJobByUser();
     }
 }
-void JobDoer::playAnimation(std::string s) {
+void JobDoer::playAnimation(std::string s, void * data) {
     if (JOB_DOER_BUSY) {
         throw std::runtime_error("playAnimation called on JobDoer, that was still busy with another task");
     }
@@ -112,6 +112,7 @@ void JobDoer::playAnimation(std::string s) {
     starting = true;
     dropOnAnimationEnd = false; 
     nextAnimationName = s;
+    animationData = data;
 }
 void JobDoer::pickUpAnimation(std::shared_ptr<Pickup> p) {
     if (JOB_DOER_BUSY) {
@@ -134,8 +135,8 @@ void JobDoer::dropAnimation() {
     nextAnimationName = "drop";
 }
 void JobDoer::onJobFinished() {
-    if (state == waiting || state == idle) {
-        std::cout << "onJobFinished called on JobDoer, but we werent doing any animation or walking!" << std::endl;
+    if (state != waiting && state != idle) {
+        throw std::runtime_error("onJobFinished called on JobDoer, but we were still busy with some action! ");
     }
     job->deleteLastReference();
     job.reset();

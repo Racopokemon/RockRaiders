@@ -42,6 +42,7 @@ class Pickup : public LocatedEntity {
 
         //!Used by the world to assign a new JobPickup for this Pickup. 
         //Requires that there is no other Job bound to this one yet. 
+        //If the Job is deleted, it happens by system: use cancelJobBySystem().
         void setJob(std::shared_ptr<JobPickup> p);
 
         std::shared_ptr<JobPickup> getJob();

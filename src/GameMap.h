@@ -12,7 +12,7 @@ class GameMap : public Entity {
 
     public : 
         virtual void update();
-        virtual void draw (sf::RenderTarget &target, float delta);
+        virtual void draw (sf::RenderTarget &target, float delta, bool debug);
 
         int getWidth();
         int getHeight();
@@ -37,8 +37,18 @@ class GameMap : public Entity {
 
         bool isPositionWalkable(sf::Vector2i pos);
 
+        bool isBreakableWall(sf::Vector2i pos);
+
+        bool isGeneralWall(sf::Vector2i pos);
+
+        //!This requires the given position to be a wall, check before with isWall. The hardness then is a constant value for each type of wall. 
+        bool getWallStrength(sf::Vector2i pos);
+
         //!Obvoiusly this is only for quick debugging purposes. 
         sf::Vector2i getRandomPosition();
+        
+        bool inMapBounds(sf::Vector2i pos);
+
     protected : 
 
         int width, height; 
@@ -58,6 +68,7 @@ class GameMap : public Entity {
         void generateGraph();
 
     private : 
+        Block & getBlock(sf::Vector2i pos);
         bool inBounds(int x, int y);
         bool isPositionWalkable(int x, int y);
         void connectIfFree(Graph & g, sf::Vector2i start, sf::Vector2i* pos, int listSize, bool onlyAverageFirstAndLast);

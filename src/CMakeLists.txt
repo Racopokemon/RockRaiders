@@ -20,7 +20,9 @@ set(var_main_sources
 	Pickup.cpp
 	Worker.cpp
 	JobPickup.h
-	JobWalk.h)
+	JobWalk.h
+	JobDrill.h
+	TileJobs.cpp)
 
 find_package(SFML 2.5.1 COMPONENTS audio graphics window system REQUIRED)
 

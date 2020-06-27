@@ -11,7 +11,12 @@ void Job::onJobStarted(std::shared_ptr<JobDoer> jd) {
         throw std::runtime_error("Job was started ... but there is already a JobDoer assigned to us! ");
     }
     doer = jd; 
+    callNumber = 0;
     onActionFinished();
+}
+
+void Job::onActionFinished() {
+    onActionFinished(callNumber++);
 }
 
 void Job::cancelBySystem() {

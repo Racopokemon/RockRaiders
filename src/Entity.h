@@ -13,7 +13,7 @@ class Entity {
 
         //!Returning true means that we want to be deleted! 
         bool update_impl();
-        virtual void draw(sf::RenderTarget &target, float delta) = 0;
+        virtual void draw(sf::RenderTarget &target, float delta, bool debug) = 0;
 
         void requestDeletion();
         virtual void prepareDeletion() {};

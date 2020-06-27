@@ -52,11 +52,21 @@ bool Worker::readyForNextTileInPath() {
 
 void Worker::initAnimation() {
     animationFrame = 0;
-    animationLength = 10; //Later, we of course look into the animationName variable
+    if (animationName == ANIMATION_DRILL) {
+        animationLength = *((int *)animationData);
+        delete (int *)animationData;
+    } else {
+        animationLength = 10; //For now all other animations last simply 10 frames. 
+    }
+    animationPlaying = true;
 }
 bool Worker::updateAnimation() {
-    return ++animationFrame >= animationLength;
-    //if (isJobCancelled()) {return true;} cancel mid-animation if job becomes invalid?
+    bool finishedAfterThisUpdate = ++animationFrame >= animationLength;
+    if (finishedAfterThisUpdate) {
+        animationPlaying = false; 
+    }
+    return finishedAfterThisUpdate;
+    //if (isJobCancelled()) {return true;} cancel mid-animation if job becomes invalid? <-- for drilling, yes. 
 }
 void Worker::updatePickupAnimation() {
     pickup->updateWhileCarried(getPosition(), true); //Thinking about it, this is an issue. 
@@ -69,7 +79,7 @@ void Worker::updatePickupAnimation() {
 void Worker::initIdle() {};
 void Worker::idleAnimation() {};
 
-void Worker::draw(sf::RenderTarget &target, sf::RenderStates states, float delta, float invDelta) {
+void Worker::draw(sf::RenderTarget &target, sf::RenderStates states, float delta, float invDelta, bool debug) {
     float thiccness = 0.22f;
     sf::CircleShape circle(thiccness, 6);
     circle.setFillColor(sf::Color::Transparent);
@@ -78,27 +88,29 @@ void Worker::draw(sf::RenderTarget &target, sf::RenderStates states, float delta
     circle.setPosition(-thiccness, -thiccness);
     target.draw(circle, states);
 
-    sf::RectangleShape rect(sf::Vector2f(1.f, 1.f));
-    sf::Vector2i t = getTile();
-    rect.setPosition(sf::Vector2f(t.x, t.y));
-    rect.setOutlineColor(sf::Color::Blue);
-    rect.setFillColor(sf::Color::Transparent);
-    rect.setOutlineThickness(0.03f);
-    target.draw(rect);
-
-    float cs = 0.05f;
-    sf::CircleShape center(cs);
-    center.setFillColor(sf::Color::Black);
-    center.setPosition(getPosition() - sf::Vector2f(cs,cs));
-    target.draw(center);
-
-    if (path.size() > walkingTileIndex) {
-        rect = sf::RectangleShape(sf::Vector2f(0.15f, 0.15));
-        sf::Vector2i t = path[walkingTileIndex];
-        rect.setPosition(sf::Vector2f(t.x+0.425f, t.y+0.425f));
-        rect.setOutlineColor(sf::Color::Red);
+    if (debug) {
+        sf::RectangleShape rect(sf::Vector2f(1.f, 1.f));
+        sf::Vector2i t = getTile();
+        rect.setPosition(sf::Vector2f(t.x, t.y));
+        rect.setOutlineColor(sf::Color::Blue);
         rect.setFillColor(sf::Color::Transparent);
         rect.setOutlineThickness(0.03f);
         target.draw(rect);
+
+        float cs = 0.05f;
+        sf::CircleShape center(cs);
+        center.setFillColor(sf::Color::Black);
+        center.setPosition(getPosition() - sf::Vector2f(cs,cs));
+        target.draw(center);
+
+        if (path.size() > walkingTileIndex) {
+            rect = sf::RectangleShape(sf::Vector2f(0.15f, 0.15));
+            sf::Vector2i t = path[walkingTileIndex];
+            rect.setPosition(sf::Vector2f(t.x+0.425f, t.y+0.425f));
+            rect.setOutlineColor(sf::Color::Red);
+            rect.setFillColor(sf::Color::Transparent);
+            rect.setOutlineThickness(0.03f);
+            target.draw(rect);
+        }
     }
 }

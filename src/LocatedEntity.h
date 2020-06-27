@@ -22,19 +22,19 @@
             lastPosition = position;
             lastRotation = rotation; 
         }
-        virtual void draw(sf::RenderTarget &target, float delta) {
+        virtual void draw(sf::RenderTarget &target, float delta, bool debug) {
             float invDelta = 1.f-delta;
             sf::Transform trans;
             trans.translate(position*delta + lastPosition*invDelta);
             trans.rotate(rotation*delta + lastRotation*invDelta);
-            draw(target, sf::RenderStates(trans), delta, invDelta);
+            draw(target, sf::RenderStates(trans), delta, invDelta, debug);
         }
 
         /*!For the main purposes it succeeds to implement this draw method instead of the one from Entity: 
         * If you use the given RenderStates to draw, this already applies the right interpolated transformation so that you can 
         * assume the center of the LocatedEntity to be at 0,0
         */ 
-        virtual void draw(sf::RenderTarget &target, sf::RenderStates states, float delta, float invDelta) = 0;
+        virtual void draw(sf::RenderTarget &target, sf::RenderStates states, float delta, float invDelta, bool debug) = 0;
 
         /*!If you choose not to interpolate, then the LocatedEntity starts interpolating from the given position (we update the lastPosition variable)
          * If you change the position afterwards, it interpolates to this new, changed position

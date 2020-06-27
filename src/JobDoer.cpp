@@ -30,6 +30,7 @@ void JobDoer::update() {
         //Every tick without a job is a lost tick! Let's spam the world with requests every tick until we get one! 
         world->requestJob(std::dynamic_pointer_cast<JobDoer>(ref()));
     }
+    onBeginOfTick();
 
     if (state == idle) {
         if (starting) {

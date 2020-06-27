@@ -39,7 +39,11 @@ class JobDoer : public LocatedEntity {
         //!Extension to onJobFinished, where we instantly get a new Job assigned instead of asking the World for it
         void setNextJob(std::shared_ptr<Job> j);
 
-
+        //!Within one update-step, we first call the job for the next task (if our previous task was finished with a true return value in the previous tick) 
+        //(or request a new job), then call the init funcions if we start some new animation or task, and directly after update it. 
+        //In the very end we update the pickup position. 
+        //You might need a call that happens before we init or update animations, and thats what this function is for. 
+        virtual void onBeginOfTick();
         //!Place for individual motion styles, using your own variables. 
         //Don't move here yet, the first followPath() call comes directly after! 
         virtual void initPath() = 0;

@@ -69,6 +69,8 @@ void JobDoer::update() {
     }
 }
 
+void JobDoer::onBeginOfTick() {}
+
 //!Called by the World to determine a suitable Job for us
 std::shared_ptr<Pickup> JobDoer::getPickup() {
     return pickup;

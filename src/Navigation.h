@@ -33,34 +33,39 @@ std::vector<sf::Vector2i> dijkstra(Node * start, Node * target, int gridWidth, i
     //R is empty
     //Distances are infinity
     std::unique_ptr<DijkstraData[]> data(new DijkstraData[gridWidth*gridHeight]);
-    std::vector<unsigned int> seenNodes;
+    std::vector<int> seenNodes;
     //Add start.
     int startIndex = getNodeDataIndex(start->getPosition(), gridWidth);
     data[startIndex].l = 0;
     data[startIndex].referenceToNode = start; 
     seenNodes.push_back(startIndex);
 
-    unsigned int targetIndex = getNodeDataIndex(target->getPosition(), gridWidth);
+    int targetIndex = getNodeDataIndex(target->getPosition(), gridWidth);
 
     while(!seenNodes.empty()) {
         //Find [[maybe later: random]] node n with smallest value of l outside R [there was a trick to this tho, to prevent sorting]
-        unsigned int minValue = HIGHEST_UNSIGNED_INT;
-        unsigned minIndex = HIGHEST_UNSIGNED_INT;
-        unsigned int minIndexIndex; //Just another reason why this code is ... cancer
+        int minValue = HIGHEST_UNSIGNED_INT;
+        std::vector<int> minIndexIndexVector;
         for (unsigned int i = 0; i < seenNodes.size(); i++) {
             int indexAtI = seenNodes[i];
             if (minValue > data[indexAtI].l) {
                 minValue = data[indexAtI].l;
-                minIndex = indexAtI;
-                minIndexIndex = i;
+                minIndexIndexVector.clear();
+                minIndexIndexVector.push_back(i);
+            } else if (minValue == data[indexAtI].l) {
+                minIndexIndexVector.push_back(i);
             }
         }
+        //Out of all nodex with a shortest l value in minIndexIndexVector, we randomly pick one. 
+        int minIndexIndex = minIndexIndexVector[rand() % minIndexIndexVector.size()];
+        int minIndex = seenNodes[minIndexIndex];
+
         if (minIndex == targetIndex) {
             //We found a shortest path to the destination node. 
             //Trace back the path. 
             length = minValue; 
             std::vector<sf::Vector2i> pathBackwards;
-            unsigned int currentIndex = targetIndex;
+            int currentIndex = targetIndex;
             while (currentIndex != startIndex) {
                 pathBackwards.push_back(data[currentIndex].referenceToNode->getPosition());
                 currentIndex = getNodeDataIndex(data[currentIndex].p, gridWidth);

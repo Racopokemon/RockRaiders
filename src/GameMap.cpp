@@ -123,7 +123,7 @@ int GameMap::getMovementSpeed(sf::Vector2i pos) {
     return map[pos.x][pos.y].getMovementSpeed();
 }
 
-int GameMap::getMovementTime(sf::Vector2i pos) {
+float GameMap::getMovementTime(sf::Vector2i pos) {
     return (int)(10000.f / (float)getMovementSpeed(pos));
 }
 
@@ -166,7 +166,7 @@ bool GameMap::inBounds(int x, int y) {
 
 //!We dont check the collision of the first position, we expect this to be already checked
 void GameMap::connectIfFree(Graph & g, sf::Vector2i start, sf::Vector2i* pos, int listSize, bool onlyAverageFirstAndLast) {
-    int sum = getMovementSpeed(start);
+    float sum = getMovementTime(start);
     sf::Vector2i nextPos;
     for (int i = 0; i < listSize; i++) {
         nextPos = start+pos[i];
@@ -175,19 +175,19 @@ void GameMap::connectIfFree(Graph & g, sf::Vector2i start, sf::Vector2i* pos, in
         }
         if (!onlyAverageFirstAndLast) {
             //We only ask for the movement speed when isPositionWalkable was true, meaning that our position was in bounds
-            sum += getMovementSpeed(nextPos);
+            sum += getMovementTime(nextPos);
         }
     }
     if (onlyAverageFirstAndLast) {
         sum += getMovementTime(nextPos);
-        sum /= 2;
+        sum /= 2.f;
     } else {
         sum /= (listSize+1);
     }
     
-    sum = (int)((float)sum * hypotf(pos[listSize-1].x, pos[listSize-1].y));
+    int length = (int)(sum * hypotf(pos[listSize-1].x, pos[listSize-1].y));
 
-    g.connect(start, nextPos, sum);
+    g.connect(start, nextPos, length);
 }
 
 void GameMap::setModified() {

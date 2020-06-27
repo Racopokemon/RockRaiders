@@ -33,7 +33,7 @@ class GameMap : public Entity {
         int getMovementSpeed(sf::Vector2i pos);
 
         //The time is consistent, but it is not per second or anything - but für navigation this is enough. 
-        int getMovementTime(sf::Vector2i pos);
+        float getMovementTime(sf::Vector2i pos);
 
         bool isPositionWalkable(sf::Vector2i pos);
 

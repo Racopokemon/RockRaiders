@@ -10,6 +10,7 @@
 class Worker : public JobDoer {
     public : 
         Worker(std::shared_ptr<World> w, sf::Vector2f spawnPos);
+        virtual void onBeginOfTick();
         virtual void initPath();
         virtual bool followPath();
         virtual void initAnimation();

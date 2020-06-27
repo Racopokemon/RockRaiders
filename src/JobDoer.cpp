@@ -13,6 +13,23 @@ JobDoer::JobDoer(std::shared_ptr<World> w) {
 
 void JobDoer::update() {
     LocatedEntity::update();
+    if (dropNextTick) {
+        dropNextTick = false;
+        drop();
+    }
+    if (finished) {
+        finished = false;
+        if (job) {
+            state = waiting; 
+            job->onActionFinished();
+        } else {
+            state = idle; 
+        }
+        starting = true;
+    } else if (state == idle) {
+        //Every tick without a job is a lost tick! Let's spam the world with requests every tick until we get one! 
+        world->requestJob(std::dynamic_pointer_cast<JobDoer>(ref()));
+    }
 
     if (state == idle) {
         if (starting) {
@@ -20,43 +37,22 @@ void JobDoer::update() {
             initIdle();
         }
         idleAnimation();
-
-        //Every tick without a job is a lost tick! Let's spam the world with requests every tick until we get one! 
-        world->requestJob(std::dynamic_pointer_cast<JobDoer>(ref()));
     } else if (state == walking) {
         if (starting) {
             starting = false; 
             initPath();
         }
         if (followPath()) {
-            starting = true;
-            if (job) {
-                state = waiting; 
-                job->onActionFinished(); 
-            } else {
-                //in case the job was cancelled. 
-                state = idle;
-            }
+            finished = true;
         }
     } else if (state == animation) {
         if (starting) {
             starting = false; 
-            animationName = nextAnimationName;
             initAnimation();
         }
         if (updateAnimation()) {
-            starting = true;
-            if (dropOnAnimationEnd) {
-                dropOnAnimationEnd = false;
-                drop();
-            }
-            if (job) {
-                state = waiting; 
-                job->onActionFinished(); 
-                //in case the job was cancelled. 
-            } else {
-                state = idle;
-            }
+            finished = true;
+            dropNextTick = true;
         }
     } else { //waiting here, ... should not happen
         if (starting) {
@@ -111,7 +107,7 @@ void JobDoer::playAnimation(std::string s, void * data) {
     state = animation;
     starting = true;
     dropOnAnimationEnd = false; 
-    nextAnimationName = s;
+    animationName = s;
     animationData = data;
 }
 void JobDoer::pickUpAnimation(std::shared_ptr<Pickup> p) {
@@ -121,7 +117,7 @@ void JobDoer::pickUpAnimation(std::shared_ptr<Pickup> p) {
     state = animation;
     starting = true;
     dropOnAnimationEnd = false; 
-    nextAnimationName = "pickup";
+    animationName = ANIMATION_PICKUP;
     pickUp(p);
 }
 //!Inits animation "drop" and afterwards drop()s the Pickup.
@@ -132,7 +128,7 @@ void JobDoer::dropAnimation() {
     state = animation;
     starting = true;
     dropOnAnimationEnd = true; 
-    nextAnimationName = "drop";
+    animationName = ANIMATION_DROP;
 }
 void JobDoer::onJobFinished() {
     if (state != waiting && state != idle) {

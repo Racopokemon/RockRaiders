@@ -96,13 +96,12 @@ class JobDoer : public LocatedEntity {
         
         bool isJobCancelled(); 
 
-        //Name of the animation that is currently executed. This indeed MAY be accessed during rendering (path and pathEnd not). 
+        //Name of the animation that is currently executed.
         std::string animationName;
-        //!If we should only move on the tile, the current tile is still inside the path. 
-        //In the last frame of an animation or motion, this might change already, so DONT USE THIS FOR RENDERING,
-        //save your own copy / states instead.  
+        //!Path to walk when walkPath is called. If we should only move on the tile, the current tile is still inside the path. 
+        //The exact target position is stored in pathEnd
         std::vector<sf::Vector2i> path;
-        //QShould also not be accessed for rendering, see path variable. 
+        //Exact position where to arrive at the target tile at the end of the path
         sf::Vector2f pathEnd; 
 
         //!On heap, delete this within this animation ... I suggest doing it directly in initAnimation. 
@@ -110,9 +109,10 @@ class JobDoer : public LocatedEntity {
     private :
         bool jobCancelled; 
         JobDoerState state = idle; 
-        bool starting = true; 
+        bool starting = true;
+        bool finished = false; 
         bool dropOnAnimationEnd = false; 
-        std::string nextAnimationName; 
+        bool dropNextTick = false; 
 };
 
 #endif

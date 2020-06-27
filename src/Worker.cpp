@@ -58,15 +58,16 @@ void Worker::initAnimation() {
     } else {
         animationLength = 10; //For now all other animations last simply 10 frames. 
     }
-    animationPlaying = true;
+    
 }
 bool Worker::updateAnimation() {
     bool finishedAfterThisUpdate = ++animationFrame >= animationLength;
-    if (finishedAfterThisUpdate) {
-        animationPlaying = false; 
+    animationPlaying = true; //This is not done in initAnimation, because we might already know that at the end of a tick the animation will begin the tick after
+
+    if (isJobCancelled() && animationName == ANIMATION_DRILL) {
+        finishedAfterThisUpdate = true; 
     }
     return finishedAfterThisUpdate;
-    //if (isJobCancelled()) {return true;} cancel mid-animation if job becomes invalid? <-- for drilling, yes. 
 }
 void Worker::updatePickupAnimation() {
     pickup->updateWhileCarried(getPosition(), true); //Thinking about it, this is an issue. 
@@ -79,6 +80,10 @@ void Worker::updatePickupAnimation() {
 void Worker::initIdle() {};
 void Worker::idleAnimation() {};
 
+void Worker::onBeginOfTick() {
+    animationPlaying = false;
+}
+
 void Worker::draw(sf::RenderTarget &target, sf::RenderStates states, float delta, float invDelta, bool debug) {
     float thiccness = 0.22f;
     sf::CircleShape circle(thiccness, 6);
@@ -87,6 +92,25 @@ void Worker::draw(sf::RenderTarget &target, sf::RenderStates states, float delta
     circle.setOutlineThickness(0.04f);
     circle.setPosition(-thiccness, -thiccness);
     target.draw(circle, states);
+
+    if (animationPlaying) {
+        float barWidth = 0.8f, barHeight = 0.1f;
+
+        float interpolation = (animationFrame+delta)/animationLength;
+        interpolation*=barWidth;
+
+        sf::RectangleShape barProgress(sf::Vector2f(interpolation, barHeight));
+        barProgress.setPosition(barWidth*-0.5f, thiccness + 0.1f);
+        barProgress.setFillColor(sf::Color::Black);
+        target.draw(barProgress, states);
+
+        sf::RectangleShape barOutline(sf::Vector2f(barWidth, barHeight));
+        barOutline.setPosition(barWidth*-0.5f, thiccness + 0.1f);
+        barOutline.setFillColor(sf::Color::Transparent);
+        barOutline.setOutlineThickness(0.01f);
+        barOutline.setOutlineColor(sf::Color::Black);
+        target.draw(barOutline, states);
+    }
 
     if (debug) {
         sf::RectangleShape rect(sf::Vector2f(1.f, 1.f));

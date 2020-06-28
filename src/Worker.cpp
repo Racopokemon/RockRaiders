@@ -99,17 +99,20 @@ void Worker::draw(sf::RenderTarget &target, sf::RenderStates states, float delta
         float interpolation = (animationFrame+delta)/animationLength;
         interpolation*=barWidth;
 
+        sf::Vector2f pos = sf::Vector2f(barWidth*-0.5f, thiccness + 0.1f);
+        pos += getPosition();
+
         sf::RectangleShape barProgress(sf::Vector2f(interpolation, barHeight));
-        barProgress.setPosition(barWidth*-0.5f, thiccness + 0.1f);
+        barProgress.setPosition(pos);
         barProgress.setFillColor(sf::Color::Black);
-        target.draw(barProgress, states);
+        target.draw(barProgress);
 
         sf::RectangleShape barOutline(sf::Vector2f(barWidth, barHeight));
-        barOutline.setPosition(barWidth*-0.5f, thiccness + 0.1f);
+        barOutline.setPosition(pos);
         barOutline.setFillColor(sf::Color::Transparent);
         barOutline.setOutlineThickness(0.01f);
         barOutline.setOutlineColor(sf::Color::Black);
-        target.draw(barOutline, states);
+        target.draw(barOutline);
     }
 
     if (debug) {

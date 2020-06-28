@@ -21,14 +21,23 @@ World::World(std::string mapName) {
     addEntity(map);
     tileJobs = std::make_unique<TileJobs>(map->getWidth(), map->getHeight());
     srand(1337);
-    for (int i = 0; i < 28; i++) {
+    for (int i = 0; i < 10; i++) {
+        float randx = rand()%800/1000.f;
+        float randy = rand()%800/1000.f;
+        sf::Vector2f pos(2.1f+randx, 2.1f+randy);
+        Worker * w = new Worker(ref(), pos);
+        addEntity(w->ref());
+    }
+    //Random workers
+    for (int i = 0; i < 0; i++) {
         sf::Vector2i pos = map->getRandomPosition();
         if (map->isPositionWalkable(pos)) {
             Worker * w = new Worker(ref(), LocatedEntity::getTileCenter(pos));
             addEntity(w->ref());
         }
     }
-    for (int i = 0; i < 50; i++) {
+    //Random walking tasks
+    for (int i = 0; i < 0; i++) {
         sf::Vector2i pos = map->getRandomPosition();
         if (map->isPositionWalkable(pos)) {
             sf::Vector2f dest = sf::Vector2f(pos.x, pos.y);
@@ -88,6 +97,13 @@ void World::onTileClicked(sf::Vector2f pos) {
         }
     }
 }
+
+void World::destroyWall(sf::Vector2i pos) {
+    int crystal, ore;
+    map->destroyWall(pos, crystal, ore);
+    tileJobs->deleteWall(pos);
+}
+
 
 TileJobs * World::getTileJobs() {
     return tileJobs.get();

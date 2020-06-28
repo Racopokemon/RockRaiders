@@ -53,7 +53,9 @@ void JobDoer::update() {
         }
         if (updateAnimation()) {
             finished = true;
-            dropNextTick = true;
+            if (animationName == ANIMATION_DROP) {
+                dropNextTick = true;
+            }
         }
     } else { //waiting here, ... should not happen
         if (starting) {
@@ -96,10 +98,10 @@ void JobDoer::walkTo(sf::Vector2f v) {
     state = walking; 
     starting = true; 
     pathEnd = v;
-    int i;
-    path = world->getMap()->findPathBetween(getTile(), toTile(v), i);
+    path = world->getMap()->findPathBetween(getTile(), toTile(v));
     if (path.empty()) {
         std::cout << "THIS IS AN ERROR! There was no path found to the destination of the JobDoer. Therefore the jobDoer is actually not able to perform the Job and cancels it now!" << std::endl;
+        path.push_back(getTile());
         cancelJobByUser();
     }
 }

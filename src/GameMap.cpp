@@ -113,9 +113,19 @@ std::vector<sf::Vector2i> GameMap::findPathBetween(sf::Vector2i start, std::vect
     return getGraph()->findPathBetween(start, targets, length, exitConditionLength);
 }
 
+std::vector<sf::Vector2i> GameMap::findPathBetween(sf::Vector2i start, sf::Vector2i target, int exitConditionLength) {
+    int i;
+    return findPathBetween(start, target, i, exitConditionLength);
+}
+
+std::vector<sf::Vector2i> GameMap::findPathBetween(sf::Vector2i start, std::vector<sf::Vector2i> targets, int exitConditionLength) {
+    int i;
+    return findPathBetween(start, targets, i, exitConditionLength);
+}
+
 int GameMap::getPathLength(sf::Vector2i start, sf::Vector2i target, int exitConditionLength) {
     int length = -1;
-    findPathBetween(start, target, length);
+    findPathBetween(start, target, length, exitConditionLength);
     return length;
 }
 bool GameMap::connected(sf::Vector2i start, sf::Vector2i target) {
@@ -126,7 +136,7 @@ bool GameMap::connected(sf::Vector2f start, sf::Vector2f target) {
 }
 int GameMap::getPathLength(sf::Vector2i start, std::vector<sf::Vector2i> targets, int exitConditionLength) {
     int length = -1;
-    findPathBetween(start, targets, length);
+    findPathBetween(start, targets, length, exitConditionLength);
     return length;
 }
 bool GameMap::connected(sf::Vector2i start, std::vector<sf::Vector2i> targets) {
@@ -233,11 +243,19 @@ bool GameMap::isGeneralWall(sf::Vector2i pos) {
     return getBlock(pos).isGeneralWall();
 }
 
-bool GameMap::getWallStrength(sf::Vector2i pos) {
+int GameMap::getWallStrength(sf::Vector2i pos) {
     return getBlock(pos).getWallStrength();
 }
 
-
+void GameMap::destroyWall(sf::Vector2i pos, int & crystalNumber, int & oreNumber) {
+    Block & b = getBlock(pos);
+    crystalNumber = b.getCrystalAmount();
+    oreNumber = b.getOreAmount();
+    b.setBlockType(RUBBLE);
+    b.setOreAmount(RUBBLE_STEPS-1);
+    b.setRubbleAmount(0);
+    setModified();
+}
 /**! Here we assume that you know that this is block actually holds rubble. 
  * Reduces the rubble amount by 1 and turns the block into a normal ground block when all rubble was removed.
  * Returns true if this brings another ore to the light. 
@@ -261,15 +279,3 @@ bool removeRubble() {
     return removeRubble;
 }*/
 
-/**! We expect that you know that this block actually was some drill-able block. 
- * Places rubble on the ground, primes it with ores.
- * Returns an two-elemented array with first the crystal-number and second with the ore-number. 
- */
-/*
-void drillBlock(int & crystalNumber, int & oreNumber) {
-    crystalNumber = metaA;
-    oreNumber = metaB;
-    type = RUBBLE;
-    metaA = 5;
-    metaB = 5;
-}*/

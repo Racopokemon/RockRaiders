@@ -225,7 +225,7 @@ int main() {
     updateViewport(sf::Vector2f((float)newSize.x, (float)newSize.y));
 
     // The sf::VideoMode class has some interesting static functions to get the desktop resolution, or the list of valid video modes for fullscreen mode. 
-    World * w = new World("maps/defaultMap.txt");
+    World * w = new World("maps/drillMap.txt");
     world = w->ref();
 
     camCenter = sf::Vector2f(world->getMap()->getWidth()*0.5f, world->getMap()->getHeight()*0.5f);

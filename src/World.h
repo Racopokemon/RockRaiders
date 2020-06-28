@@ -45,6 +45,9 @@ class World {
         //!We still receive the float position, because this allows us e.g. to specify the exact position for workers to navigate to
         void onTileClicked(sf::Vector2f pos);
 
+        //!We expect that you know this to actually be a wall. Changes the map and spawns ores. 
+        void destroyWall(sf::Vector2i pos);
+
         TileJobs * getTileJobs();
 
 

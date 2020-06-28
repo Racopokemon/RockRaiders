@@ -40,7 +40,7 @@ struct Block {
         }
 
         //! Just for debug reasons this also sets both meta values to -1, should be very obvious then to spot errors
-        BlockType setBlockType(const BlockType type) {
+        void setBlockType(const BlockType type) {
             this->type = type;
             metaA = -1;
             metaB = -1;

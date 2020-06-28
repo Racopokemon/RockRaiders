@@ -22,10 +22,11 @@ class GameMap : public Entity {
         ~GameMap();
 
         std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length, int exitConditionLength = ~0u);
-
         //!Finds the shortest path to the closest of the targets. 
         std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, std::vector<sf::Vector2i> targets, int & length, int exitConditionLength = ~0u);
-
+        std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, sf::Vector2i target, int exitConditionLength = ~0u);
+        //!Finds the shortest path to the closest of the targets. 
+        std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, std::vector<sf::Vector2i> targets, int exitConditionLength = ~0u);
         //!-1 means that there doesn't exist a path. Just calls findPathBetween. 
         int getPathLength(sf::Vector2i start, sf::Vector2i target, int exitConditionLength = ~0u);
         //! True if target can be reached from start. Just calls getPathLength.
@@ -52,12 +53,16 @@ class GameMap : public Entity {
         bool isGeneralWall(sf::Vector2i pos);
 
         //!This requires the given position to be a wall, check before with isWall. The hardness then is a constant value for each type of wall. 
-        bool getWallStrength(sf::Vector2i pos);
+        int getWallStrength(sf::Vector2i pos);
 
         //!Obvoiusly this is only for quick debugging purposes. 
         sf::Vector2i getRandomPosition();
         
         bool inMapBounds(sf::Vector2i pos);
+
+        //! We expect that you know that this block actually was some drill-able block. 
+        //Places rubble on the ground, primes it with ores.
+        void destroyWall(sf::Vector2i pos, int & crystalNumber, int & oreNumber);
 
     protected : 
 

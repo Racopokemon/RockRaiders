@@ -27,9 +27,10 @@ unsigned int getNodeDataIndex(sf::Vector2i v, int width) {
 /**
  * Runs Dijkstra on the given grid graph. (We use the grid structure to store data for all the nodes and use the node coordinates, 
  * therefore we need to know width and height of the grid graph)
- * Returns a path starting with start node and ending with target note. If there is no path, we return an empty vector. 
+ * Returns a path starting with start node and ending with one of the target nodes. If there is no path, we return an empty vector. 
+ * About exitLengthCondition: Once we realize a shortest path will have at least the length of exitLengthCondition, we return early and return no path. 
  */
-std::vector<sf::Vector2i> dijkstra(Node * start, Node * target, int gridWidth, int gridHeight,int & length) {
+std::vector<sf::Vector2i> dijkstra(Node * start, std::vector<Node*> targets, int gridWidth, int gridHeight, int & length, unsigned int exitLengthCondition = HIGHEST_UNSIGNED_INT) {
     //R is empty
     //Distances are infinity
     std::unique_ptr<DijkstraData[]> data(new DijkstraData[gridWidth*gridHeight]);
@@ -40,7 +41,10 @@ std::vector<sf::Vector2i> dijkstra(Node * start, Node * target, int gridWidth, i
     data[startIndex].referenceToNode = start; 
     seenNodes.push_back(startIndex);
 
-    int targetIndex = getNodeDataIndex(target->getPosition(), gridWidth);
+    std::vector<int> targetIndices;
+    for (Node * n : targets) {
+        targetIndices.push_back(getNodeDataIndex(n->getPosition(), gridWidth));
+    }
 
     while(!seenNodes.empty()) {
         //Find [[maybe later: random]] node n with smallest value of l outside R [there was a trick to this tho, to prevent sorting]
@@ -56,16 +60,23 @@ std::vector<sf::Vector2i> dijkstra(Node * start, Node * target, int gridWidth, i
                 minIndexIndexVector.push_back(i);
             }
         }
+
+        if (minValue >= exitLengthCondition) { //Exit condition
+            return std::vector<sf::Vector2i>();
+        }
+
         //Out of all nodex with a shortest l value in minIndexIndexVector, we randomly pick one. 
         int minIndexIndex = minIndexIndexVector[rand() % minIndexIndexVector.size()];
         int minIndex = seenNodes[minIndexIndex];
 
-        if (minIndex == targetIndex) {
+        //source: https://www.techiedelight.com/check-vector-contains-given-element-cpp/
+        auto targetEntry = std::find(targetIndices.begin(), targetIndices.end(), minIndex);
+        if (targetEntry != targetIndices.end()) {
             //We found a shortest path to the destination node. 
             //Trace back the path. 
             length = minValue; 
             std::vector<sf::Vector2i> pathBackwards;
-            int currentIndex = targetIndex;
+            int currentIndex = *targetEntry;
             while (currentIndex != startIndex) {
                 pathBackwards.push_back(data[currentIndex].referenceToNode->getPosition());
                 currentIndex = getNodeDataIndex(data[currentIndex].p, gridWidth);
@@ -90,8 +101,9 @@ std::vector<sf::Vector2i> dijkstra(Node * start, Node * target, int gridWidth, i
                 adjacentNodeData.referenceToNode = adjacentNode;
                 seenNodes.push_back(adjacentNodeIndex);
             }
-            if (adjacentNodeData.l > e.weight + data[minIndex].l) {
-                adjacentNodeData.l = e.weight + data[minIndex].l;
+            int newWeight = e.weight + data[minIndex].l;
+            if (adjacentNodeData.l > newWeight || (adjacentNodeData.l == newWeight && rand()%3==1)) { //Veeery cheap and not-linear or anything randomization
+                adjacentNodeData.l = newWeight;
                 adjacentNodeData.p = data[minIndex].referenceToNode->getPosition();
             }
         }

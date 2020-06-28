@@ -50,7 +50,7 @@ class Graph {
         void connect(sf::Vector2i a, sf::Vector2i b, unsigned int weight);
         //!Returns a vector of positions that lead from start to target, first element is start, last element is target. 
         //If the vector is empty, no path was found. In this case length is not changed. 
-        std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length);
+        std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, std::vector<sf::Vector2i> targets, int & length, int exitConditionLength = ~0u);
     private : 
         int width = 0, height = 0;
         Node * nodes; 

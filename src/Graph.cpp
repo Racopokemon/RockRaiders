@@ -36,9 +36,10 @@ void Graph::init() {
     }
 }
 
-/**
- *!Returns a shortest path from start to target position. 
- */
-std::vector<sf::Vector2i> Graph::findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length) {
-    return dijkstra(getNode(start), getNode(target), width, height, length);
+std::vector<sf::Vector2i> Graph::findPathBetween(sf::Vector2i start, std::vector<sf::Vector2i> targets, int & length, int exitConditionLength) {
+    std::vector<Node*> nodes;
+    for (sf::Vector2i t : targets) {
+        nodes.push_back(getNode(t));
+    }
+    return dijkstra(getNode(start), nodes, width, height, length, exitConditionLength);
 }

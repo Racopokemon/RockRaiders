@@ -21,14 +21,24 @@ class GameMap : public Entity {
 
         ~GameMap();
 
-        std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length);
+        std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length, int exitConditionLength = ~0u);
+
+        //!Finds the shortest path to the closest of the targets. 
+        std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, std::vector<sf::Vector2i> targets, int & length, int exitConditionLength = ~0u);
 
         //!-1 means that there doesn't exist a path. Just calls findPathBetween. 
-        int getPathLength(sf::Vector2i start, sf::Vector2i target);
+        int getPathLength(sf::Vector2i start, sf::Vector2i target, int exitConditionLength = ~0u);
         //! True if target can be reached from start. Just calls getPathLength.
         bool connected(sf::Vector2i start, sf::Vector2i target);
         //!see the other connected() function.
         bool connected(sf::Vector2f start, sf::Vector2f target);
+        //!Finds the shortest path to any of the targets. -1 means that there doesn't exist a path. Just calls findPathBetween. 
+        int getPathLength(sf::Vector2i start, std::vector<sf::Vector2i> targets, int exitConditionLength = ~0u);
+        //!True, if one of the targets is reachable
+        bool connected(sf::Vector2i start, std::vector<sf::Vector2i> targets);
+        //!True, if one of the targets is reachable
+        bool connected(sf::Vector2f start, std::vector<sf::Vector2f> targets);
+
 
         int getMovementSpeed(sf::Vector2i pos);
 

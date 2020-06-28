@@ -103,11 +103,17 @@ std::shared_ptr<Graph> GameMap::getGraph() {
 }
 
 //!See the documentation of findPathBetween in Graph.h
-std::vector<sf::Vector2i> GameMap::findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length) {
-    return getGraph()->findPathBetween(start, target, length);
+std::vector<sf::Vector2i> GameMap::findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length, int exitConditionLength) {
+    std::vector<sf::Vector2i> vec;
+    vec.push_back(target);
+    return findPathBetween(start, vec, length, exitConditionLength);
 }
 
-int GameMap::getPathLength(sf::Vector2i start, sf::Vector2i target) {
+std::vector<sf::Vector2i> GameMap::findPathBetween(sf::Vector2i start, std::vector<sf::Vector2i> targets, int & length, int exitConditionLength) {
+    return getGraph()->findPathBetween(start, targets, length, exitConditionLength);
+}
+
+int GameMap::getPathLength(sf::Vector2i start, sf::Vector2i target, int exitConditionLength) {
     int length = -1;
     findPathBetween(start, target, length);
     return length;
@@ -117,6 +123,21 @@ bool GameMap::connected(sf::Vector2i start, sf::Vector2i target) {
 }
 bool GameMap::connected(sf::Vector2f start, sf::Vector2f target) {
     return getPathLength(LocatedEntity::toTile(start), LocatedEntity::toTile(target)) != -1;
+}
+int GameMap::getPathLength(sf::Vector2i start, std::vector<sf::Vector2i> targets, int exitConditionLength) {
+    int length = -1;
+    findPathBetween(start, targets, length);
+    return length;
+}
+bool GameMap::connected(sf::Vector2i start, std::vector<sf::Vector2i> targets) {
+    return getPathLength(start, targets) != -1;
+}
+bool GameMap::connected(sf::Vector2f start, std::vector<sf::Vector2f> targets) {
+    std::vector<sf::Vector2i> vec;
+    for (sf::Vector2f v : targets) {
+        vec.push_back(LocatedEntity::toTile(v));
+    }
+    return getPathLength(LocatedEntity::toTile(start), vec) != -1;
 }
 
 int GameMap::getMovementSpeed(sf::Vector2i pos) {

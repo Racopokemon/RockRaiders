@@ -24,7 +24,8 @@ set(var_main_sources
 	JobDrill.h
 	TileJobs.cpp
 	Ore.h
-	Crystal.h)
+	Crystal.h
+	JobDeliver.h)
 
 find_package(SFML 2.5.1 COMPONENTS audio graphics window system REQUIRED)
 

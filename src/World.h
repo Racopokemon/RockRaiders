@@ -1,6 +1,8 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#include "Shortcuts.h"
+
 /*
 class JobDoer;
 class Pickup;
@@ -21,6 +23,7 @@ class TileJobs;
 class World {
     public : 
         World(std::string mapName);
+        ~World();
 
         //! The mastermind of job scheduling. 
         //Here we assign a job to the JobDoer, that he is able to perform (also reachable etc.)
@@ -38,8 +41,8 @@ class World {
         //! Every Pickup that is ever dropped on the ground (also when newly created) calls this.
         //The world will do one of the following three actions, depending on the ground below the Pickup: 
         //Just let the Pickup lay there (waiting for construction to finish)
-        //Create a Pickup task for it (and tell the Pickup)
-        //Remove the Pickup (Dropped in some storage)
+        //Create a Pickup task for it
+        //Remove the Pickup (Absorbed by some storage)
         void pickupDropped(std::shared_ptr<Pickup> p);
 
         //!We still receive the float position, because this allows us e.g. to specify the exact position for workers to navigate to
@@ -48,8 +51,10 @@ class World {
         //!We expect that you know this to actually be a wall. Changes the map and spawns ores. 
         void destroyWall(sf::Vector2i pos);
 
-        TileJobs * getTileJobs();
+        //!It's only a copy, do with it whatever you want. 
+        std::vector<sf::Vector2f> getStorageLocations();
 
+        TileJobs * getTileJobs();
 
         GameMap * getMap();
 
@@ -62,10 +67,13 @@ class World {
 
     protected : 
 
+        void pickupDropped(std::shared_ptr<Pickup> p, bool droppedNew);
+
         std::shared_ptr<GameMap> map; 
         std::list<std::shared_ptr<Job>> jobList; 
 
         std::vector<sf::Vector2f> storageLocations;
+        std::vector<sf::Vector2i> storageTiles;
 
         std::unique_ptr<TileJobs> tileJobs;
         

@@ -16,10 +16,12 @@ class Entity {
         virtual void draw(sf::RenderTarget &target, float delta, bool debug) = 0;
 
         void requestDeletion();
-        virtual void prepareDeletion() {};
 
         //Use the dynamic pointer cast to get the actual pointer. 
         std::shared_ptr<Entity> ref();
+    protected :
+        virtual void prepareDeletion() {};
+    
     private :
         bool deleteRequested = false; 
         std::shared_ptr<Entity> reference;

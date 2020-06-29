@@ -22,6 +22,7 @@ class JobDoer;
 class Job {
     public :
         Job() {}; //You should not use this tho except for default initializations
+        //!Here we also inform the target that we are (one of) its assigned job(s)
         Job(std::shared_ptr<World> w); 
         ~Job() {
             std::cout<<"Job deleted"<<std::endl;

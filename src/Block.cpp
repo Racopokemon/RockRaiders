@@ -10,6 +10,14 @@ void Block::setBuildingType(BuildingType type) {
     metaA = type;
 }
 
+bool Block::getVisibleAtStart() {
+    return metaB != 0;
+}
+
+int Block::getWorkersAtStart() {
+    return metaA;
+}
+
 //!True if this is some kind of ground block that entities can walk on
 bool Block::isWalkable() {
     return isBlockWalkable(*this);
@@ -37,4 +45,12 @@ int Block::getWallStrength() {
 
 bool Block::isAbsorbingPickups() {
     return getBlockAbsorbingPickups(*this);
+}
+
+bool Block::isHoldingPickups() {
+    return getBlockHoldingPickups(*this);
+}
+
+bool Block::isStorageBuilding() {
+    return getBlockStorageBuilding(*this);
 }

@@ -6,9 +6,9 @@
 ;	A Normal 1		#Crystals, #Ore
 ;	B Normal 2		#Crystals, #Ore
 ;	C Normal 3		#Crystals, #Ore
-;	  Ground		
+;	  Ground		#Workers, 1: Visible at start (and all connected)
 ;	. Rubble		Amount (0-5 with 5 the most), #Ore still inside
-;	= Plate			
+;	= Plate			#Workers, 1: Visible at start (and all connected)
 ;	+ Building		Number, Orientation
 ;	* Building Pl.	
 ;	O OreF			
@@ -26,9 +26,9 @@ img/map.png
 ;	Main Map:
 ################################
 #=== #####BBAAA##AA     #####CC#
-#=+=  AABBB      A####    ###C##
+#=+=  AABBB      A####  + ###C##
 #===  AABBA   ==   A####    AC##
-###AA##BBAA  ==   BBB###### ####
+###AA##BBAA  ==+  BBB###### ####
 ###BC#####   === B#C######AB####
 ##CCCB#####     A#BCB##AAAB#####
 ####AA  ## #H####BA#    ##BBB###
@@ -46,9 +46,9 @@ img/map.png
 ;	Please keep the empty line above, this ends the level data
 ;	Metadata 1 (#Crystals, Rubble amount, Buildung ID)
 00000000000000000000000000000000
-00000000000100000000000000000030
-00000000000000000000000000000000
-00001010001000000000000000000000
+00100000000100000000000000000030
+01020000000000000000000000000000
+00200010001000000000000000000000
 00000000000000000000000000000000
 00001000000000000000000000000000
 00300000000000002010000010000000
@@ -69,7 +69,7 @@ img/map.png
 00000000000000000000000000000000
 00000000003010100200000000000100
 00000020100000000100000000000000
-00000001120000000000000000000100
+00010001120000000000000000000100
 00010001000000000001000000000000
 00010000000000000000000000000000
 00031000000000000011000003100000

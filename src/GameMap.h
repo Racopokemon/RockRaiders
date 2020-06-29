@@ -39,7 +39,12 @@ class GameMap : public Entity {
         bool connected(sf::Vector2i start, std::vector<sf::Vector2i> targets);
         //!True, if one of the targets is reachable
         bool connected(sf::Vector2f start, std::vector<sf::Vector2f> targets);
-
+        //!If none of the targets is reachable, x and y of the result are -1.
+        sf::Vector2i getClosest(sf::Vector2i start, std::vector<sf::Vector2i> targets);
+        //!If none of the targets is reachable, x and y of the result are -1.
+        sf::Vector2f getClosest(sf::Vector2f start, std::vector<sf::Vector2f> targets);
+        //!Maybe try not using this (too much, the world needs it in the beginning eg) and rather request the properties (wall, walkable, ...)
+        BlockType getBlockType(sf::Vector2i pos);
 
         int getMovementSpeed(sf::Vector2i pos);
 
@@ -54,12 +59,26 @@ class GameMap : public Entity {
 
         bool isGeneralWall(sf::Vector2i pos);
 
+        bool isAbsorbingPickups(sf::Vector2i pos);
+
+        bool isHoldingPickups(sf::Vector2i pos);
+
+        bool getVisibleAtStart(sf::Vector2i pos);
+
+        int getWorkersAtStart(sf::Vector2i pos);
+
+        BuildingType getBuildingType(sf::Vector2i pos);
+
+        bool isStorageBuilding(sf::Vector2i pos);
+
         //!This requires the given position to be a wall, check before with isWall. The hardness then is a constant value for each type of wall. 
         int getWallStrength(sf::Vector2i pos);
 
         //!Obvoiusly this is only for quick debugging purposes. 
         sf::Vector2i getRandomPosition();
         
+        static sf::Vector2f getRandomPositionInTile(sf::Vector2i tile, float insetToAllSides);
+
         bool inMapBounds(sf::Vector2i pos);
 
         //! We expect that you know that this block actually was some drill-able block. 

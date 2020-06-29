@@ -118,6 +118,7 @@ void capZoom() {
 
 void initEditor() {
     debugMode = true;
+    updateTime = -1;
     updateGameSpeed(true, 60);
     editorWidth = world->getMap()->getWidth();
     editorHeight = world->getMap()->getHeight();
@@ -164,7 +165,7 @@ void updateEditor() {
 
 void printEditor() {
     std::cout << ";	Please keep the empty line above, this ends the level data" << std::endl;
-    std::cout << ";	Metadata 1 (#Crystals, Rubble amount, Buildung ID)" << std::endl;
+    std::cout << ";	Metadata 1 (#Crystals, Rubble amount, Buildung ID, #workers)" << std::endl;
     int i = 0;
     for (int y = 0; y < editorHeight; y++) {
         for (int x = 0; x < editorWidth; x++) {
@@ -175,7 +176,7 @@ void printEditor() {
     i = 0;
     std::cout << std::endl;
     std::cout << ";	Please keep the empty line above, this ends the level data" << std::endl;
-    std::cout << ";	Metadata 2 (#Ore, Building Orientation)" << std::endl;
+    std::cout << ";	Metadata 2 (#Ore, visible at start)" << std::endl;
     for (int y = 0; y < editorHeight; y++) {
         for (int x = 0; x < editorWidth; x++) {
             std::cout << editorMetaB[i++];

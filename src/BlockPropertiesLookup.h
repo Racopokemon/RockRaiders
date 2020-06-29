@@ -29,4 +29,8 @@ int getBlockWallStrength(Block b);
 
 bool getBlockAbsorbingPickups(Block b);
 
+bool getBlockHoldingPickups(Block b);
+
+bool getBlockStorageBuilding(Block b);
+
 #endif

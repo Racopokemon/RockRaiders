@@ -105,3 +105,12 @@ bool getBlockAbsorbingPickups(Block b) {
     }
     return false; 
 }
+
+bool getBlockHoldingPickups(Block b) {
+    //Hey, you discovered a stub! 
+    return false; 
+}
+
+bool getBlockStorageBuilding(Block b) {
+    return b.getBuildingType() == BASE;
+}

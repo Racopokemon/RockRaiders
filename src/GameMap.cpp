@@ -142,12 +142,32 @@ int GameMap::getPathLength(sf::Vector2i start, std::vector<sf::Vector2i> targets
 bool GameMap::connected(sf::Vector2i start, std::vector<sf::Vector2i> targets) {
     return getPathLength(start, targets) != -1;
 }
+
 bool GameMap::connected(sf::Vector2f start, std::vector<sf::Vector2f> targets) {
-    std::vector<sf::Vector2i> vec;
-    for (sf::Vector2f v : targets) {
-        vec.push_back(LocatedEntity::toTile(v));
+    return getPathLength(LocatedEntity::toTile(start), LocatedEntity::toTiles(targets)) != -1;
+}
+
+sf::Vector2i GameMap::getClosest(sf::Vector2i start, std::vector<sf::Vector2i> targets) {
+    int i;
+    std::vector<sf::Vector2i> path = findPathBetween(start, targets);
+    if (path.empty()) {
+        return sf::Vector2i(-1, -1);
+    } else {
+        return path[path.size()-1];
     }
-    return getPathLength(LocatedEntity::toTile(start), vec) != -1;
+}
+sf::Vector2f GameMap::getClosest(sf::Vector2f start, std::vector<sf::Vector2f> targets) {
+    sf::Vector2i pos = getClosest(LocatedEntity::toTile(start), LocatedEntity::toTiles(targets));
+    if (pos == sf::Vector2i(-1, -1)) {
+        return sf::Vector2f(-1, -1);
+    }
+    for (sf::Vector2f v : targets) {
+        if (LocatedEntity::toTile(v) == pos) {
+            return v;
+        }
+    }
+    std::cout << "Congrats, you reached a line of code that should be impossible to reach. (GameMap::getClosest)" << std::endl;
+    return sf::Vector2f(-1, -1);
 }
 
 int GameMap::getMovementSpeed(sf::Vector2i pos) {
@@ -193,6 +213,13 @@ bool GameMap::isPositionWalkable(int x, int y) {
 
 bool GameMap::inBounds(int x, int y) {
     return !(x < 0 || x >= width || y < 0 || y > height);
+}
+
+sf::Vector2f GameMap::getRandomPositionInTile(sf::Vector2i tile, float insetToAllSides) {
+    sf::Vector2f pos = sf::Vector2f(rand()%1000 / 1000.f, rand()%1000 / 1000.f);
+    pos -= sf::Vector2f(0.5f, 0.5f);
+    pos *= 1.f-2*insetToAllSides;
+    return pos + LocatedEntity::getTileCenter(tile);
 }
 
 //!We dont check the collision of the first position, we expect this to be already checked
@@ -245,6 +272,10 @@ void GameMap::getEditorData(int * metaA, int* metaB) {
     }
 }
 
+BlockType GameMap::getBlockType(sf::Vector2i pos) {
+    return getBlock(pos).getBlockType();
+}
+
 bool GameMap::isBreakableWall(sf::Vector2i pos) {
     return getBlock(pos).isBreakableWall();
 }
@@ -253,8 +284,24 @@ bool GameMap::isGeneralWall(sf::Vector2i pos) {
     return getBlock(pos).isGeneralWall();
 }
 
+bool GameMap::isAbsorbingPickups(sf::Vector2i pos) {
+    return getBlock(pos).isAbsorbingPickups();
+}
+
+bool GameMap::isHoldingPickups(sf::Vector2i pos) {
+    return getBlock(pos).isHoldingPickups();
+}
+
 int GameMap::getWallStrength(sf::Vector2i pos) {
     return getBlock(pos).getWallStrength();
+}
+
+BuildingType GameMap::getBuildingType(sf::Vector2i pos) {
+    return getBlock(pos).getBuildingType();
+}
+
+bool GameMap::isStorageBuilding(sf::Vector2i pos) {
+    return getBlock(pos).isStorageBuilding();
 }
 
 void GameMap::destroyWall(sf::Vector2i pos, int & crystalNumber, int & oreNumber) {
@@ -266,6 +313,16 @@ void GameMap::destroyWall(sf::Vector2i pos, int & crystalNumber, int & oreNumber
     b.setRubbleAmount(0);
     setModified();
 }
+
+bool GameMap::getVisibleAtStart(sf::Vector2i pos) {
+    return getBlock(pos).getVisibleAtStart();
+}
+
+int GameMap::getWorkersAtStart(sf::Vector2i pos) {
+    return getBlock(pos).getWorkersAtStart();
+}
+
+
 /**! Here we assume that you know that this is block actually holds rubble. 
  * Reduces the rubble amount by 1 and turns the block into a normal ground block when all rubble was removed.
  * Returns true if this brings another ore to the light. 

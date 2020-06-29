@@ -31,6 +31,11 @@ unsigned int getNodeDataIndex(sf::Vector2i v, int width) {
  * About exitLengthCondition: Once we realize a shortest path will have at least the length of exitLengthCondition, we return early and return no path. 
  */
 std::vector<sf::Vector2i> dijkstra(Node * start, std::vector<Node*> targets, int gridWidth, int gridHeight, int & length, unsigned int exitLengthCondition = HIGHEST_UNSIGNED_INT) {
+
+    if (targets.empty()) {
+        return std::vector<sf::Vector2i>(); 
+    }
+
     //R is empty
     //Distances are infinity
     std::unique_ptr<DijkstraData[]> data(new DijkstraData[gridWidth*gridHeight]);

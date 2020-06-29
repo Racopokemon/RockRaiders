@@ -76,6 +76,11 @@ struct Block {
         void setOreAmount(int const amount) {
             metaB = amount; 
         }
+        
+        //!A flag that might be set only for normal ground
+        bool getVisibleAtStart();
+
+        int getWorkersAtStart();
 
         BuildingType getBuildingType();
 
@@ -103,6 +108,10 @@ struct Block {
         }
 
         bool isAbsorbingPickups();
+
+        bool isStorageBuilding();
+
+        bool isHoldingPickups();
 };
 
 #endif

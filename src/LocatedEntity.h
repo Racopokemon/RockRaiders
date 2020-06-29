@@ -17,6 +17,14 @@
             return sf::Vector2i((int)v.x, (int)v.y);
         }
 
+        static std::vector<sf::Vector2i> toTiles(std::vector<sf::Vector2f> pos) {
+            std::vector<sf::Vector2i> vec;
+            for (sf::Vector2f v : pos) {
+                vec.push_back(toTile(v));
+            }
+            return vec;
+        }
+
         //!Call this *before* you continue with your calculations in the subclass! [The return value of this doesn't matter of course if you overwrite this]
         virtual void update() {
             lastPosition = position;

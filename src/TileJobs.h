@@ -2,10 +2,12 @@
 #define TILE_JOBS_H
 
 #include <SFML/Graphics.hpp>
+class JobDeliver;
 class JobDrill;
 
 struct TileJobData {
     std::shared_ptr<JobDrill> drill;
+    std::vector<std::shared_ptr<JobDeliver>> deliver;
 };
 
 //!Just for some order (and more actually not really necessary inter-class calls)
@@ -27,6 +29,10 @@ class TileJobs {
         //Job with the task to drill, either if the Job was finished or canceled. Does nothing further (no destruction call etc).
         void unsetJobDrill(sf::Vector2i w);
         std::shared_ptr<JobDrill> getJobDrill(sf::Vector2i w);
+
+        void addJobDeliver(sf::Vector2i w, std::shared_ptr<JobDeliver> j);
+        void removeJobDeliver(sf::Vector2i w, std::shared_ptr<JobDeliver> j);
+        void cancelAllJobDeliverBySystem(sf::Vector2i w);
 
     protected : 
         int width;

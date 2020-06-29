@@ -4,8 +4,9 @@
 #include "World.h"
 #include "JobDoer.h"
 #include "Job.h"
-#include "JobPickup.h"
+class JobPickup;
 #include "LocatedEntity.h"
+#include <iostream>
 /**
  * !Pickups are rather lazy Entities, not really doing anything, even letting their carriers move them.
  * The only thing they care about is feeding the World with a new Job to pick them up when dropped on a
@@ -18,7 +19,10 @@ class Pickup : public LocatedEntity {
     public : 
         Pickup() {} //!Don't use this except for placeholder initializations
         //!If startsAsCarried is false, we will notify the world about us being dropped (might create JobPickups etc.)
-        Pickup(std::shared_ptr<World> w, bool startsAsCarried);
+        Pickup(std::shared_ptr<World> w, sf::Vector2f pos, bool startsAsCarried);
+
+        //Still in for debugging purposes
+        ~Pickup() {std::cout << "Pickup deleted. " << std::endl;};
 
         void update();
 
@@ -44,6 +48,15 @@ class Pickup : public LocatedEntity {
         //Requires that there is no other Job bound to this one yet. 
         //If the Job is deleted, it happens by system: use cancelJobBySystem().
         void setJob(std::shared_ptr<JobPickup> p);
+
+        //!Requires that there is already a job set - and in the case someone decides that another job
+        //is better to pick this pickup up, then this function will just forget the current job, without
+        //calling anything on it. 
+        void unsetJob();
+
+        //!Needed by the world, when the ground changes and ... maybe we need a new job assigned, but maybe there is already
+        //a worker coming for us ..
+        bool hasJob();
 
         std::shared_ptr<JobPickup> getJob();
 

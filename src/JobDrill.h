@@ -11,14 +11,14 @@ class JobDrill : public Job {
     public : 
         JobDrill(std::shared_ptr<World> w, sf::Vector2i t) : Job(w) {
             target = t;
+            world->getTileJobs()->setJobDrill(t, std::dynamic_pointer_cast<JobDrill>(ref()));
         }
         bool canBeExecutedBy(std::shared_ptr<JobDoer> jd) {
             return world->getMap()->connected(jd->getTile(), getAdjacentPositions());
         }
         void onActionFinished(int callNumber) {
             if (callNumber == 0) {
-                auto path = world->getMap()->findPathBetween(doer->getTile(), getAdjacentPositions());
-                sf::Vector2i dest = path[path.size()-1];
+                sf::Vector2i dest = world->getMap()->getClosest(doer->getTile(), getAdjacentPositions());
                 sf::Vector2i diff = target - dest;
                 doer->walkTo(sf::Vector2f(dest.x + 0.5f + diff.x*0.45f, dest.y + 0.5f + diff.y*0.45f)); 
             } else if (callNumber == 1) {

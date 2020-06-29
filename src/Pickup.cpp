@@ -1,14 +1,16 @@
 #include "Pickup.h"
+#include "JobPickup.h"
 
-Pickup::Pickup(std::shared_ptr<World> w, bool startsAsCarried) {
+Pickup::Pickup(std::shared_ptr<World> w, sf::Vector2f pos, bool startsAsCarried) {
     world = w;
+    setPosition(pos);
     if (!startsAsCarried) {
         beDropped();
     }
 }
 
 void Pickup::bePickedUpBy(std::shared_ptr<JobDoer> j) {
-    if (!carrier) {
+    if (carrier) {
         throw new std::runtime_error("Wanted to pick up a Pickup that already is picked up by a JobDoer");
     }
     carrier = j;
@@ -58,6 +60,18 @@ void Pickup::setJob(std::shared_ptr<JobPickup> p) {
     if (job) {
         throw new std::runtime_error("Tried to setJob on a pickup, that already has a job assigned!");
     }
+    job = p;
+}
+
+void Pickup::unsetJob() {
+    if (!job) {
+        throw new std::runtime_error("Tried to change the job, but there was no one assigned before");
+    }
+    job.reset();
+}
+
+bool Pickup::hasJob() {
+    return job.operator bool(); //Wtf was ist das wieder für ein absurder Syntax? Dass man das überhaupt noch kompilieren *kann* ...
 }
 
 std::shared_ptr<JobPickup> Pickup::getJob() {

@@ -35,6 +35,9 @@ bool Worker::followPath() {
     }
     float moveSpeed = (float)(world->getMap()->getMovementSpeed(getTile()));
     moveSpeed = moveSpeed * 0.001f * 0.2f;
+    if (pickup) {
+        moveSpeed *= 0.7f;
+    }
     if ((int)path.size() <= walkingTileIndex) {
         //Fine-tune the position on the destination tile
         return moveForwardTo(pathEnd, moveSpeed);

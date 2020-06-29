@@ -8,16 +8,28 @@
 #include "World.h"
 #include "LocatedEntity.h" //Temp actually
 
+//This is the pretty messy main file. Better take a look at the other, way more structured files ;)
+
 std::vector<std::shared_ptr<Entity>> entities;
 std::shared_ptr<World> world; 
 
 bool isHalt, shouldHalt;
 sf::Time currentFrameLength, nextFrameLength, timePassedSinceFrameStart;
+int tps; //Is never used (except for displaying), gets just new values set
 sf::Time zeroTime = sf::seconds(0);
 sf::Time oneSecondTime = sf::seconds(1);
 
 sf::Time timePassedSinceLastSecond;
 unsigned int lastFPS, liveFPSCounter;
+
+//rather temp
+int updateTime;
+int renderTime;
+
+bool editor = false;
+int * editorMetaA;
+int * editorMetaB;
+int editorWidth, editorHeight;
 
 sf::View gameView; 
 sf::View HUDView;  
@@ -39,13 +51,17 @@ sf::Vector2i mouseDragStartOnScreen;
 float scrollSinceLastUpdate;
 bool lastFirstDown;
 
+float editorAScrollSinceLastUpdate;
+float editorBScrollSinceLastUpdate;
+
+
 #define BUTTON_SPACE 100.f
 #define BUTTON_INSET 5.f
 #define BUTTON_SIZE BUTTON_SPACE-2*BUTTON_INSET
 
-//this is closest possible zoom
+//!this is closest possible zoom
 #define ZOOM_MIN 0.0025f
-//this is the most distanced possible zoom
+//!this is the most distanced possible zoom
 #define ZOOM_MAX 0.5f
 
 sf::Font mainFont;
@@ -62,9 +78,11 @@ void onMapClicked(sf::Vector2f pos) {
 void updateGameSpeed(bool halt, float TPS) {
     if (halt) {
         shouldHalt = true;
+        tps = 0;
     } else {
         shouldHalt = false;
         nextFrameLength = sf::seconds(1.0f/TPS);
+        tps = TPS;
     }
 }
 
@@ -95,6 +113,74 @@ void capZoom() {
         camZoom = ZOOM_MIN;
     } else if (camZoom > ZOOM_MAX) {
         camZoom = ZOOM_MAX;
+    }
+}
+
+void initEditor() {
+    debugMode = true;
+    updateGameSpeed(true, 60);
+    editorWidth = world->getMap()->getWidth();
+    editorHeight = world->getMap()->getHeight();
+    editorMetaA = new int[editorWidth*editorHeight];
+    editorMetaB = new int[editorWidth*editorHeight];
+    world->getMap()->getEditorData(editorMetaA, editorMetaB);
+}
+
+void renderEditor(sf::RenderTarget &target) {
+    int i = 0;
+    for (int y = 0; y < editorHeight; y++) {
+        for (int x = 0; x < editorWidth; x++) {
+            std::string print = std::to_string(editorMetaA[i]) + ", " + std::to_string(editorMetaB[i]);
+            sf::Text text;
+            text.setFont(mainFont);
+            text.setString(print);
+            text.setCharacterSize(20.f);
+            text.setPosition(sf::Vector2f(x + 0.2f, y+0.2f));
+            text.setScale(sf::Vector2f(0.01f, 0.01f));
+            text.setFillColor(sf::Color::White);
+            target.draw(text);
+            i++;
+        }
+    }
+}
+
+void updateEditor() {
+    sf::Vector2i local = sf::Mouse::getPosition(*gameWindow);
+    sf::Vector2f mouseOnMap = gameWindow->mapPixelToCoords(local, gameView);
+    sf::Vector2i tile = LocatedEntity::toTile(mouseOnMap);
+    if (world->getMap()->inMapBounds(tile)) {
+        int i = tile.x + tile.y*editorWidth;
+        if (editorAScrollSinceLastUpdate != 0) {
+            editorMetaA[i] += round(editorAScrollSinceLastUpdate);
+        }
+        if (editorBScrollSinceLastUpdate != 0) {
+            editorMetaB[i] += round(editorBScrollSinceLastUpdate);
+        }
+    }
+
+    editorBScrollSinceLastUpdate = 0;
+    editorAScrollSinceLastUpdate = 0;
+}
+
+void printEditor() {
+    std::cout << ";	Please keep the empty line above, this ends the level data" << std::endl;
+    std::cout << ";	Metadata 1 (#Crystals, Rubble amount, Buildung ID)" << std::endl;
+    int i = 0;
+    for (int y = 0; y < editorHeight; y++) {
+        for (int x = 0; x < editorWidth; x++) {
+            std::cout << editorMetaA[i++];
+        }
+        std::cout << std::endl;
+    }
+    i = 0;
+    std::cout << std::endl;
+    std::cout << ";	Please keep the empty line above, this ends the level data" << std::endl;
+    std::cout << ";	Metadata 2 (#Ore, Building Orientation)" << std::endl;
+    for (int y = 0; y < editorHeight; y++) {
+        for (int x = 0; x < editorWidth; x++) {
+            std::cout << editorMetaB[i++];
+        }
+        std::cout << std::endl;
     }
 }
 
@@ -136,13 +222,13 @@ void tick() {
         updateGameView();
     }
 
-
     lastFirstDown = firstDown;
     //lastMousePos = mousePos;
     scrollSinceLastUpdate = 0;
 }
 
 void update() {
+    sf::Clock clock;
     unsigned int i = 0;
     while (i < entities.size()) {
         if (entities[i]->update_impl()) {
@@ -153,17 +239,30 @@ void update() {
             i++;
         }
     }
+    updateTime = clock.restart().asMicroseconds()/10;
+}
+
+void drawText(std::string s, sf::Vector2f pos) {
+    sf::Text text;
+    text.setFont(mainFont);
+    text.setString(s);
+    text.setCharacterSize(18);
+    text.setPosition(pos);
+    text.setFillColor(sf::Color::White);
+    target->draw(text);
 }
 
 //Screen Coordinates here span from 0 to windowSize.x and 0 to windowSize.y
 void renderHUD() {
-    sf::Text fpsDisplay;
-    fpsDisplay.setFont(mainFont);
-    fpsDisplay.setString(std::to_string(lastFPS));
-    fpsDisplay.setCharacterSize(18);
-    fpsDisplay.setPosition(sf::Vector2f(10.f, 2.f));
-    fpsDisplay.setFillColor(sf::Color::White);
-    target->draw(fpsDisplay);
+    if (debugMode) {
+        drawText("FPS: " + std::to_string(lastFPS), sf::Vector2f(10.f, 20.f));
+        drawText("TPS: " + std::to_string(tps), sf::Vector2f(10.f, 38.f));
+        drawText("Update time: " + std::to_string(updateTime), sf::Vector2f(10.f, 56.f));
+        drawText("Render time: " + std::to_string(renderTime), sf::Vector2f(10.f, 74.f));
+        if (editor) {
+            drawText("Welcome to the cheapest editor ever seen, sorry for this. Modify meta with A + Scroll, S + Scroll. Print with enter. ", sf::Vector2f(10.f, 2.f));
+        }
+    }
 }
 
 //Screen coordinates are scaled so that one button has the size of BUTTON_SPACE, and from origin at top x left
@@ -182,12 +281,20 @@ void renderMenu() {
 
 //!Delta 0: Previous frame 100% interpolated, 1 current frame 100% interpolated
 void render(float delta) {
+    sf::Clock clock;
     tick();
+    if (editor) {
+        updateEditor();
+    }
 
     target->setView(gameView);
     target->clear(sf::Color::Black);
     for (auto entity : entities) {
         entity->draw(*target, delta, debugMode);
+    }
+
+    if (editor) {
+        renderEditor(*target);
     }
 
     target->setView(HUDView);
@@ -197,6 +304,7 @@ void render(float delta) {
     renderMenu();
 
     gameWindow->display();
+    renderTime = clock.restart().asMicroseconds()/10;
 }
 
 const std::vector<std::shared_ptr<Entity>> getEntities() {
@@ -252,36 +360,53 @@ int main() {
                 break;
             case sf::Event::MouseWheelScrolled:
                 if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
-                    scrollSinceLastUpdate += event.mouseWheelScroll.delta;
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+                        editorAScrollSinceLastUpdate += event.mouseWheelScroll.delta;
+                    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+                        editorBScrollSinceLastUpdate += event.mouseWheelScroll.delta;
+                    } else {
+                        scrollSinceLastUpdate += event.mouseWheelScroll.delta;
+                    }
                 }
                 break;
             case sf::Event::KeyPressed:
-                if (event.key.code == sf::Keyboard::Space) {
-                    debugMode = !debugMode;
-                }
-                if (event.key.code == sf::Keyboard::Num1) {
-                    updateGameSpeed(true, 60);
-                }
-                if (event.key.code == sf::Keyboard::Num2) {
-                    updateGameSpeed(false, 3);
-                }
-                if (event.key.code == sf::Keyboard::Num3) {
-                    updateGameSpeed(false, 10);
-                }
-                if (event.key.code == sf::Keyboard::Num4) {
-                    updateGameSpeed(false, 25);
-                }
-                if (event.key.code == sf::Keyboard::Num5) {
-                    updateGameSpeed(false, 60);
-                }
-                if (event.key.code == sf::Keyboard::Num6) {
-                    updateGameSpeed(false, 100);
-                }
-                if (event.key.code == sf::Keyboard::Num7) {
-                    updateGameSpeed(false, 250);
-                }
-                if (event.key.code == sf::Keyboard::Num8) {
-                    updateGameSpeed(false, 500);
+                if (!editor) {
+                    if (event.key.code == sf::Keyboard::Tab) {
+                        editor = true; 
+                        initEditor();
+                    }
+                    if (event.key.code == sf::Keyboard::Space) {
+                        debugMode = !debugMode;
+                    }
+                    if (event.key.code == sf::Keyboard::Num1) {
+                        updateGameSpeed(true, 60);
+                    }
+                    if (event.key.code == sf::Keyboard::Num2) {
+                        updateGameSpeed(false, 3);
+                    }
+                    if (event.key.code == sf::Keyboard::Num3) {
+                        updateGameSpeed(false, 10);
+                    }
+                    if (event.key.code == sf::Keyboard::Num4) {
+                        updateGameSpeed(false, 25);
+                    }
+                    if (event.key.code == sf::Keyboard::Num5) {
+                        updateGameSpeed(false, 60);
+                    }
+                    if (event.key.code == sf::Keyboard::Num6) {
+                        updateGameSpeed(false, 100);
+                    }
+                    if (event.key.code == sf::Keyboard::Num7) {
+                        updateGameSpeed(false, 250);
+                    }
+                    if (event.key.code == sf::Keyboard::Num8) {
+                        updateGameSpeed(false, 500);
+                    }
+                } else {
+                    //Cheap editor commmands
+                    if (event.key.code == sf::Keyboard::Enter) {
+                        printEditor();
+                    }
                 }
                 break; 
             }

@@ -235,6 +235,16 @@ Block & GameMap::getBlock(sf::Vector2i pos) {
     return map[pos.x][pos.y];
 }
 
+void GameMap::getEditorData(int * metaA, int* metaB) {
+    int index = 0;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            getBlock(sf::Vector2i(x, y)).getMetaValuesForEditor(&metaA[index], &metaB[index]);
+            index++;
+        }
+    }
+}
+
 bool GameMap::isBreakableWall(sf::Vector2i pos) {
     return getBlock(pos).isBreakableWall();
 }

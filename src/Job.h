@@ -5,6 +5,7 @@ class World;
 class JobDoer;
 
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 //Jobs ...
 //lots of derived classes, each with storage on the specific task (pointer or coordinates mostly)
@@ -22,6 +23,9 @@ class Job {
     public :
         Job() {}; //You should not use this tho except for default initializations
         Job(std::shared_ptr<World> w); 
+        ~Job() {
+            std::cout<<"Job deleted"<<std::endl;
+        };
 
         //!The worlds calls this on us before with a JobDoer before assigning the task to us. 
         virtual bool canBeExecutedBy(std::shared_ptr<JobDoer> jd) = 0;

@@ -51,6 +51,7 @@ World::World(std::string mapName) {
 }
 
 void World::requestJob(std::shared_ptr<JobDoer> j) {
+    
     if (j->getPickup()) {
         std::cout << "We got a mate pickn up stuff, what were gonna do now? Are there finally ... delivery jobs?" << std::endl;
     } else {

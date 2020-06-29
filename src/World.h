@@ -65,6 +65,8 @@ class World {
         std::shared_ptr<GameMap> map; 
         std::list<std::shared_ptr<Job>> jobList; 
 
+        std::vector<sf::Vector2f> storageLocations;
+
         std::unique_ptr<TileJobs> tileJobs;
         
         std::shared_ptr<World> reference;

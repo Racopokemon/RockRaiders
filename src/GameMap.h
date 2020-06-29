@@ -63,6 +63,9 @@ class GameMap : public Entity {
         //! We expect that you know that this block actually was some drill-able block. 
         //Places rubble on the ground, primes it with ores.
         void destroyWall(sf::Vector2i pos, int & crystalNumber, int & oreNumber);
+        
+        //Cheap and dirty function that writes the metadata of all blocks into two given locations (expecting that the space is allocated etc.)
+        void getEditorData(int * metaA, int* metaB);
 
     protected : 
 

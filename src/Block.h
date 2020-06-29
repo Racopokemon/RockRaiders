@@ -83,6 +83,12 @@ struct Block {
         bool isGeneralWall();
 
         int getWallStrength();
+
+        //!This is a very cheap and dirty function to access the meta values for the improvised editor. 
+        void getMetaValuesForEditor(int * a, int * b) {
+            *a = metaA;
+            *b = metaB;
+        }
 };
 
 #endif

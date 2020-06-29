@@ -23,26 +23,25 @@ void fillInMeta(std::ifstream & fin, Block ** map, char * buffer, int width, int
     int i = 0;
     while (true) {
         readNextNotCommentedLine(fin, buffer);
-        if (buffer[0] == '\0') {
-            break;
-        }
-        int j = 0;
-        while (buffer[j] != '\0') {
-            if (j >= width) {
-                std::cout << "WARNING: In the map file for meta there is a line that exceeds the level bounds\n";
+        if (!buffer[0] == '\0') {
+            int j = 0;
+            while (buffer[j] != '\0') {
+                if (j >= width) {
+                    std::cout << "WARNING: In the map file for meta there is a line that exceeds the level bounds\n";
+                    break;
+                }
+                int metaValue = buffer[j] - '0';//some stackoverflow magic to get the actual number value from the char
+                if (metaA) {
+                    map[j][i].setMetaA(metaValue); 
+                } else {
+                    map[j][i].setMetaB(metaValue); 
+                }
+                ++j;
+            }
+            if (++i >= height) {
+                std::cout << "WARNING: In the map file for meta there are more lines than in the level itself\n";
                 break;
             }
-            int metaValue = buffer[j] - '0';//some stackoverflow magic to get the actual number value from the char
-            if (metaA) {
-                map[j][i].setMetaA(metaValue); 
-            } else {
-                map[j][i].setMetaB(metaValue); 
-            }
-            ++j;
-        }
-        if (++i >= height) {
-            std::cout << "WARNING: In the map file for meta there are more lines than in the level itself\n";
-            break;
         }
     }
 }
@@ -90,5 +89,4 @@ std::shared_ptr<GameMap> loadFromFile(std::string file) {
     fillInMeta(fin, map, buffer, width, height, false);
 
     return std::make_shared<GameMap>(map, width, height, textureName);
-
 }

@@ -25,9 +25,9 @@ img/map.png
 ;
 ;	Main Map:
 ################################
-#==  #####BBAAA##AA     #####CC#
-#==   AABBB      A####    ###C##
-####A AABBA   ==   A####    AC##
+#=== #####BBAAA##AA     #####CC#
+#=+=  AABBB      A####    ###C##
+#===  AABBA   ==   A####    AC##
 ###AA##BBAA  ==   BBB###### ####
 ###BC#####   === B#C######AB####
 ##CCCB#####     A#BCB##AAAB#####

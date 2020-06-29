@@ -15,6 +15,11 @@ enum BlockType {
     MASSIVE, HARD, NORMAL_A, NORMAL_B, NORMAL_C, GROUND, RUBBLE, PLATE, BUILDING
 };
 
+//!Up to now, there is only the basic base building where workers store all pickups and get spawned
+enum BuildingType {
+    BASE = 0
+};
+
 /*!
  * A block represents a single entry in the game's map. 
  * Depending on its BlockType it may be an empty cave part or an unpassable wall.
@@ -71,10 +76,17 @@ struct Block {
         void setOreAmount(int const amount) {
             metaB = amount; 
         }
+
+        BuildingType getBuildingType();
+
+        void setBuildingType(BuildingType type);
+
         //!True if this is some kind of ground block that entities can walk on.
         bool isWalkable();
         
         int getMovementSpeed();
+
+        float getMovementTimePriority();
 
         //!Checks if the given position is a *breakable* wall block.
         bool isBreakableWall();
@@ -89,6 +101,8 @@ struct Block {
             *a = metaA;
             *b = metaB;
         }
+
+        bool isAbsorbingPickups();
 };
 
 #endif

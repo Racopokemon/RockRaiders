@@ -43,8 +43,10 @@ class GameMap : public Entity {
 
         int getMovementSpeed(sf::Vector2i pos);
 
-        //The time is consistent, but it is not per second or anything - but für navigation this is enough. 
-        float getMovementTime(sf::Vector2i pos);
+        //The value that should be used when calculating the path travel lengths for navigation. 
+        //For normal blocks (plates, rubble, normal ground) it is calculated by calculating a movement time from the movement speed, but
+        //buildings have an (imaginary, they just feel like plates) high traversal time so that workers avoid walking at them ... if they can. 
+        float getMovementTimePriority(sf::Vector2i pos);
 
         bool isPositionWalkable(sf::Vector2i pos);
 

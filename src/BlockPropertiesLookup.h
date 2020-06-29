@@ -19,11 +19,14 @@ int getTextureNumber(Block b);
 sf::IntRect getTextureRect(Block b, int singleTextureSize);
 
 int getBlockMovementSpeed(Block b);
+float getBlockMovementTimePriority(Block b);
 bool isBlockWalkable(Block b);
 
 bool isBlockBreakableWall(Block b);
 bool isBlockGeneralWall(Block b);
 //!Number of ticks it takes to break the wall (as normal worker)
 int getBlockWallStrength(Block b);
+
+bool getBlockAbsorbingPickups(Block b);
 
 #endif

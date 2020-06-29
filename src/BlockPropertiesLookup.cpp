@@ -54,6 +54,14 @@ int getBlockMovementSpeed(Block b) {
     }
 }
 
+float getBlockMovementTimePriority(Block b) {
+    if (b.getBlockType() == BUILDING) {
+        return 10000.f / SPEED_RUBBLE;
+    } else {
+        return 10000.f / (float)getBlockMovementSpeed(b);
+    }
+}
+
 bool isBlockWalkable(Block b) {
     BlockType t = b.getBlockType();
     return t == BlockType::BUILDING || t == BlockType::GROUND || t == BlockType::PLATE || t == BlockType::RUBBLE;
@@ -87,4 +95,13 @@ int getBlockWallStrength(Block b) {
         throw std::runtime_error("Requested the strength of a block that is not a breakable wall");
         return -1;
     }
+}
+
+bool getBlockAbsorbingPickups(Block b) {
+    switch (b.getBlockType()) 
+    {
+    case BUILDING:
+        return b.getBuildingType() == BASE;
+    }
+    return false; 
 }

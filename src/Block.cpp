@@ -11,7 +11,9 @@ void Block::setBuildingType(BuildingType type) {
 }
 
 bool Block::getVisibleAtStart() {
-    return metaB != 0;
+    //Right now I think it makes sense to also automatically declare all areas as visible where workers spawn 
+    //(and if someone doesnt know this, if he spawns workers, they are visible)
+    return type == GROUND && (metaB != 0 || metaA != 0); 
 }
 
 int Block::getWorkersAtStart() {

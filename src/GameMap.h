@@ -63,13 +63,14 @@ class GameMap : public Entity {
 
         bool isHoldingPickups(sf::Vector2i pos);
 
-        bool getVisibleAtStart(sf::Vector2i pos);
-
         int getWorkersAtStart(sf::Vector2i pos);
 
         BuildingType getBuildingType(sf::Vector2i pos);
 
         bool isStorageBuilding(sf::Vector2i pos);
+
+        ///!The internal updated visibility value. All not-visible blocks are rendered black and should not be allowed to be interacted with. 
+        bool isVisible(sf::Vector2i pos);
 
         //!This requires the given position to be a wall, check before with isWall. The hardness then is a constant value for each type of wall. 
         int getWallStrength(sf::Vector2i pos);
@@ -83,6 +84,7 @@ class GameMap : public Entity {
 
         //! We expect that you know that this block actually was some drill-able block. 
         //Places rubble on the ground, primes it with ores.
+        //The only place where also visibility is updated
         void destroyWall(sf::Vector2i pos, int & crystalNumber, int & oreNumber);
         
         //Cheap and dirty function that writes the metadata of all blocks into two given locations (expecting that the space is allocated etc.)
@@ -111,6 +113,8 @@ class GameMap : public Entity {
         bool inBounds(int x, int y);
         bool isPositionWalkable(int x, int y);
         void connectIfFree(Graph & g, sf::Vector2i start, sf::Vector2i* pos, int listSize, bool onlyAverageFirstAndLast);
+        //!Very simple and cheap recursive solution to update and propagate new visibility information. But that's it, if the stack is big enough, this works! 
+        void setVisible(sf::Vector2i pos, bool recursionStart);
 };
 
 #endif

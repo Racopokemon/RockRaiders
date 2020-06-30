@@ -40,6 +40,16 @@ GameMap::GameMap(Block ** m, int width, int height, std::string texture) {
     //this->texture.setSmooth(true); 
     singleTextureSize = this->texture.getSize().x / TEXTURE_TILES_PER_ROW; 
     renderDataTextures = sf::VertexArray(sf::Quads, width*height*4); 
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            sf::Vector2i pos(x, y);
+            Block & b = getBlock(pos);
+            if (b.getVisibleAtStart()) {
+                setVisible(pos, true);
+            }
+        }
+    }
 } 
 int GameMap::getHeight() { 
     return height; 
@@ -194,6 +204,14 @@ void GameMap::updateRenderData() {
             renderDataTextures[i+2].texCoords = sf::Vector2f(textureTile.left + textureTile.width - 0.5f, textureTile.top + textureTile.height - 0.5f);
             renderDataTextures[i+3].texCoords = sf::Vector2f(textureTile.left + 0.5f, textureTile.top + textureTile.height - 0.5f);
 
+            sf::Color c = sf::Color::Black;
+            if (getBlock(sf::Vector2i(x, y)).isVisible()) {
+                c = sf::Color::White;
+            }
+            for (int j = 0; j < 4; j++) {
+                renderDataTextures[i+j].color = c;
+            }
+
             i += 4;
         }
     }
@@ -311,17 +329,36 @@ void GameMap::destroyWall(sf::Vector2i pos, int & crystalNumber, int & oreNumber
     b.setBlockType(RUBBLE);
     b.setOreAmount(RUBBLE_STEPS-1);
     b.setRubbleAmount(0);
+    if (b.isVisible()) {
+        setVisible(pos, true);
+    }
     setModified();
 }
 
-bool GameMap::getVisibleAtStart(sf::Vector2i pos) {
-    return getBlock(pos).getVisibleAtStart();
+bool GameMap::isVisible(sf::Vector2i pos) {
+    return getBlock(pos).isVisible();
 }
 
 int GameMap::getWorkersAtStart(sf::Vector2i pos) {
     return getBlock(pos).getWorkersAtStart();
 }
 
+void GameMap::setVisible(sf::Vector2i pos, bool recursionStart) {
+    if (!inMapBounds(pos)) {
+        return;
+    }
+    Block & b = getBlock(pos);
+    if (recursionStart || !b.isVisible()) {
+        b.setVisible();
+        if (!b.isGeneralWall()) {
+            setVisible(pos + sf::Vector2i(0, 1), false);
+            setVisible(pos + sf::Vector2i(0, -1), false);
+            setVisible(pos + sf::Vector2i(1, 0), false);
+            setVisible(pos + sf::Vector2i(-1, 0), false);
+        }
+    }
+    
+}
 
 /**! Here we assume that you know that this is block actually holds rubble. 
  * Reduces the rubble amount by 1 and turns the block into a normal ground block when all rubble was removed.

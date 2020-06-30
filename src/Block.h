@@ -31,12 +31,14 @@ struct Block {
     private :
         BlockType type;
         int metaA, metaB;
+        bool visible; 
     public :
         Block() {};
         Block(BlockType type, int metaA, int metaB) {
             this->type = type;
             this->metaA = metaA;
             this->metaB = metaB;
+            visible = false; 
         }
         Block(BlockType type) : Block(type, 0, 0) {}
 
@@ -49,6 +51,14 @@ struct Block {
             this->type = type;
             metaA = -1;
             metaB = -1;
+        }
+
+        bool isVisible() {
+            return visible; 
+        }
+
+        void setVisible() {
+            visible = true; 
         }
 
         void setMetaA(int a) {
@@ -77,7 +87,7 @@ struct Block {
             metaB = amount; 
         }
         
-        //!A flag that might be set only for normal ground
+        //!A flag that might be set only for normal ground. However, we check this for you when you call this. 
         bool getVisibleAtStart();
 
         int getWorkersAtStart();

@@ -98,6 +98,9 @@ std::vector<sf::Vector2f> World::getStorageLocations() {
 void World::onTileClicked(sf::Vector2f pos) {
     //This is very ... ... very temp. 
     sf::Vector2i t = LocatedEntity::toTile(pos);
+    if (!map->isVisible(t)) {
+        return;
+    }
     if (map->isPositionWalkable(t)) {
         JobWalk * j = new JobWalk(world, pos);
         addJobToList(j->ref());

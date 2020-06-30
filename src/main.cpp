@@ -318,6 +318,8 @@ void addEntity(std::shared_ptr<Entity> entity) {
 
 int main() {
 
+    std::cout << "pickup jobs arent deleted and neither are pickups themselves!!" << std::endl;
+
     sf::Vector2i newSize(800, 600);
 
     if (!mainFont.loadFromFile("fonts/redline.ttf")) {

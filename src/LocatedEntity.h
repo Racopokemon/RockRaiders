@@ -165,8 +165,6 @@
             }
         }
 
-        virtual void prepareDeletion() {Entity::prepareDeletion();};
-
         sf::Vector2i getTile() {
             return toTile(position);
         }
@@ -181,6 +179,9 @@
             return abs(p.x-tile.x) <= distance && abs(p.y-tile.y) <= distance;
         }
 
+    protected :
+            
+        virtual void prepareDeletion() {Entity::prepareDeletion();};
 
     private : 
         //!The rotation values are stored in degrees, for convenience

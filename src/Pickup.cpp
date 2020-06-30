@@ -31,7 +31,7 @@ void Pickup::update() {
         //Actually, if we are not carried, we do noting either. Maybe in the future? Animations? ... who knows
     }
 }
-        
+
 //Be careful if you call the requestDeletion anywhere, this forcefully 
 //destroys the Pickup and hard-cancels the Job bound to it. 
 void Pickup::prepareDeletion() {

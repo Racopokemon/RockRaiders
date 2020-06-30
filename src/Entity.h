@@ -15,11 +15,13 @@ class Entity {
         bool update_impl();
         virtual void draw(sf::RenderTarget &target, float delta, bool debug) = 0;
 
+        //Call this to delete the entity. It will call the internal prepareDeletion inheritance tree, and after that trigger the deletion with the next update. 
         void requestDeletion();
-
+        
         //Use the dynamic pointer cast to get the actual pointer. 
         std::shared_ptr<Entity> ref();
     protected :
+
         virtual void prepareDeletion() {};
     
     private :

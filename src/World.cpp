@@ -137,7 +137,7 @@ void World::pickupDropped(std::shared_ptr<Pickup> p, bool droppedNew) {
     //Can be used for broundChanges! Just set droppedNew to false! 
     vi pos = p->getTile();
     if (map->isAbsorbingPickups(pos)) {
-        p->prepareDeletion();
+        p->requestDeletion();
         /*
         if (storageTiles.contains(p->getTile())) {
             //somehow increase the count or anything

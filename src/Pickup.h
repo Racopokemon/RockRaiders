@@ -60,9 +60,10 @@ class Pickup : public LocatedEntity {
 
         std::shared_ptr<JobPickup> getJob();
 
+    protected : 
+
         virtual void prepareDeletion();
 
-    protected : 
         std::shared_ptr<World> world; 
         //!If this doesn't point anywhere, we are not carried currently
         std::shared_ptr<JobDoer> carrier; 

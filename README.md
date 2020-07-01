@@ -11,10 +11,10 @@ Not yet realized features are *italic*.
 * Singleplayer [**C**]
 * Loading a level from file [**B**]
   * *3+ Levels should be doable* [**C**]
-  * Technology
-      - Top-down rendering with some textures. 
-      - Enabling arbitrary framerates by interpolating motion between two ticks. This is also the foundation to the variable in-game time further below. [Maybe **C**]
-      - Movable camera, zooming in and out.
+* Technology
+    - Top-down rendering with some textures. 
+    - Enabling arbitrary framerates by interpolating motion between two ticks. This is also the foundation to the variable in-game time further below. [Maybe **C**]
+    - Movable camera, zooming in and out.
 * Game
   * *Two counters for the two resources*
   * *A basic side-menu: Blocks in the cave are clickable and then tasks (drilling them at least) can be selected from the menu.*

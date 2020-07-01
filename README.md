@@ -3,17 +3,18 @@
 This will be a recreation of an unknown Lego video game from 1999 named _Rock Raiders_. It will be a top-down real-time strategy cave mining game, where you command a crew of ai-controlled workers in a grid-shaped cave system to perform tasks like drilling walls and collecting resources. Due to the time limitation I will only realize a heavily boiled-down version, in that I focus on a solid AI and pretty visuals. 
 
 ## Features
-I had to give up some feature ideas due to the limited time, those features are ~~striked~~ (They could easily be added onto the game, since the internal structures were already made with them in mind). 
+I had to give up some initially planned feature due to the limited time, those features are ~~striked~~ (They could easily be added onto the game, since the internal structures were already made with them in mind). 
 Not yet realized features are *italic*. 
+(Interestingly, most C-level features actually got realized, while some A and lots of B features were dropped)
 ### Required
 
 * Singleplayer [**C**]
 * Loading a level from file [**B**]
   * *3+ Levels should be doable* [**C**]
   * Technology
-    * Top-down rendering with some textures. 
-    * Enabling arbitrary framerates by interpolating motion between two ticks. This is also the foundation to the variable in-game time further below. [Maybe **C**]
-   * Movable camera, zooming in and out
+      - Top-down rendering with some textures. 
+      - Enabling arbitrary framerates by interpolating motion between two ticks. This is also the foundation to the variable in-game time further below. [Maybe **C**]
+      - Movable camera, zooming in and out.
 * Game
   * *Two counters for the two resources*
   * *A basic side-menu: Blocks in the cave are clickable and then tasks (drilling them at least) can be selected from the menu.*

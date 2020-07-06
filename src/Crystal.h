@@ -17,7 +17,7 @@ class Crystal : public Pickup {
             sf::Sprite s(*texture);
             sf::Vector2u size = texture->getSize();
             s.setOrigin(0.5f*sf::Vector2f(size.x, size.y));
-            float scale = 1.f/size.x * 0.7f;
+            float scale = 1.f/size.x * 0.55f;
             s.setScale(sf::Vector2f(scale, scale));
             target.draw(s, states);
         }

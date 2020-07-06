@@ -11,12 +11,13 @@ void Job::onJobStarted(std::shared_ptr<JobDoer> jd) {
         throw std::runtime_error("Job was started ... but there is already a JobDoer assigned to us! ");
     }
     doer = jd; 
-    callNumber = 0;
+    callNumber = -1;
     onActionFinished();
 }
 
 void Job::onActionFinished() {
-    onActionFinished(callNumber++);
+    onActionFinished(++callNumber); 
+    //Actually when we return here in some places the job doesnt even exist anymore, lets rather NOT change the callNumber++ then afterwards. D:
 }
 
 void Job::cancelBySystem() {
@@ -34,5 +35,6 @@ void Job::deleteLastReference() {
 }
 
 std::shared_ptr<Job> Job::ref() {
+    //std::cout << "Job referenced. " << reference.use_count() << std::endl;
     return reference;
 }

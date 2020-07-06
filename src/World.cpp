@@ -13,7 +13,6 @@
 #include "JobDeliver.h"
 #include "JobPickup.h"
 
-
 World::World(std::string mapName) {
     reference = std::shared_ptr<World>(this);
     try {
@@ -137,7 +136,7 @@ void World::pickupDropped(std::shared_ptr<Pickup> p) {
 }
 
 void World::pickupDropped(std::shared_ptr<Pickup> p, bool droppedNew) {
-    //Can be used for broundChanges! Just set droppedNew to false! 
+    //Can be used for groundChanges! Just set droppedNew to false! 
     vi pos = p->getTile();
     if (map->isAbsorbingPickups(pos)) {
         p->requestDeletion();

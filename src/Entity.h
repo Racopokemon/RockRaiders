@@ -1,5 +1,6 @@
 #ifndef ENTITY_H
 #define ENTITY_H
+#include <iostream>
 
 #include <SFML/Graphics.hpp>
 
@@ -8,6 +9,9 @@
 //to them (like a this. reference), including routines to request deletion. 
 class Entity {
     public :
+
+        virtual ~Entity() {std::cout << "Entity deleted." << std::endl;}
+
         //!Always call super.update() first!
         virtual void update() = 0;
 

@@ -16,6 +16,8 @@ class JobDoer : public LocatedEntity {
         JobDoer() {};
         JobDoer(std::shared_ptr<World> w);
 
+        virtual ~JobDoer() {}
+
         //!Not virtual anymore, we move the functionality from here to a bunch of other virtual functions for special cases. 
         void update();
 

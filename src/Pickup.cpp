@@ -13,12 +13,17 @@ void Pickup::bePickedUpBy(std::shared_ptr<JobDoer> j) {
     if (carrier) {
         throw new std::runtime_error("Wanted to pick up a Pickup that already is picked up by a JobDoer");
     }
+    if (job) {
+        job.reset();
+    } else {
+        std::cout << "Sure that it makes any sense that this pickup was picked up ... without a job assigned to pick it up? Looks like an error!" << std::endl;
+    }
     carrier = j;
 }
 
 void Pickup::beDropped() {
     carrier.reset();
-    job.reset();
+    job.reset(); //Shouldn't do anything anymore, we 
     world->pickupDropped(std::dynamic_pointer_cast<Pickup>(ref()));
 }
 

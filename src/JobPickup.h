@@ -4,6 +4,7 @@
 #include "Shortcuts.h"
 #include "Job.h"
 #include "Pickup.h"
+#include <iostream>
 
 class JobPickup : public Job {
     public :
@@ -11,6 +12,8 @@ class JobPickup : public Job {
             pickup = p;
             p->setJob(std::dynamic_pointer_cast<JobPickup>(ref()));
         }
+
+        virtual ~JobPickup() {}
 
         virtual bool canBeExecutedBy(std::shared_ptr<JobDoer> jd) {
             if (world->getMap()->connected(pickup->getPosition(), world->getStorageLocations())) { //this later needs to be expanded for any place to drop pickups (all constructions)

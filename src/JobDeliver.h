@@ -21,6 +21,8 @@ class JobDeliver : public Job {
             world->getTileJobs()->addJobDeliver(targetTile, std::dynamic_pointer_cast<JobDeliver>(ref()));
         }
 
+        virtual ~JobDeliver() {}
+
         virtual bool canBeExecutedBy(std::shared_ptr<JobDoer> jd) {
             //We are never in a jobList and therefore this is never checked. 
             //We are instantly created for a jobDoer. 

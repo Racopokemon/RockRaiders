@@ -54,7 +54,7 @@ void TileJobs::addJobDeliver(sf::Vector2i w, std::shared_ptr<JobDeliver> j) {
     get(w).deliver.push_back(j);
 }
 void TileJobs::removeJobDeliver(sf::Vector2i w, std::shared_ptr<JobDeliver> j) {
-    std::vector<std::shared_ptr<JobDeliver>> d = get(w).deliver;
+    std::vector<std::shared_ptr<JobDeliver>> & d = get(w).deliver;
     auto f = std::find(d.begin(), d.end(), j);
     if (f == d.end()) {
         std::cout << "WARNING: There was a request to delete a JobDeliver at TileJobs - but this Job was not even registered in the first place! " << std::endl;

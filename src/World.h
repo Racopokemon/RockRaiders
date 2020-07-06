@@ -17,11 +17,14 @@ class Job;
 class TileJobs;
 #include <list>
 
+
+
 /**
  * By now, the World turns more and more into the Job coordinator, knowing all Jobs and the map and doing stuff for them
  */
 class World {
     public : 
+
         World(std::string mapName);
         ~World();
 

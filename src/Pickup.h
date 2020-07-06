@@ -22,7 +22,7 @@ class Pickup : public LocatedEntity {
         Pickup(std::shared_ptr<World> w, sf::Vector2f pos, bool startsAsCarried);
 
         //Still in for debugging purposes
-        ~Pickup() {std::cout << "Pickup deleted. " << std::endl;};
+        virtual ~Pickup() {}
 
         void update();
 

@@ -24,9 +24,7 @@ class Job {
         Job() {}; //You should not use this tho except for default initializations
         //!Here we also inform the target that we are (one of) its assigned job(s)
         Job(std::shared_ptr<World> w); 
-        ~Job() {
-            std::cout<<"Job deleted"<<std::endl;
-        };
+        virtual ~Job() {}
 
         //!The worlds calls this on us before with a JobDoer before assigning the task to us. 
         virtual bool canBeExecutedBy(std::shared_ptr<JobDoer> jd) = 0;

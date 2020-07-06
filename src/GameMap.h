@@ -95,7 +95,7 @@ class GameMap : public Entity {
         int width, height; 
         int singleTextureSize;
         Block ** map;
-        sf::Texture texture; 
+        sf::Texture * texture; 
         sf::VertexArray renderDataTextures;
         //!Set to true, this regenerates the vertex data for rendering (redraws the map) on the next draw
         bool viewModified = true; 

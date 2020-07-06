@@ -1,5 +1,7 @@
 #include "GameMap.h"
 #include "LocatedEntity.h"
+#include "TextureLoader.h"
+
 #define TEXTURE_TILES_PER_ROW 8 //finally doing them consts like a boss ... ok "boss" ...
 
 void GameMap::update() {}
@@ -10,11 +12,9 @@ GameMap::GameMap(Block ** m, int width, int height, std::string texture) {
     this->height = height; 
     
     map = m; 
-    if (!this->texture.loadFromFile(texture)) { 
-        throw "Could not load texture file " + texture; 
-    } 
+    this->texture = TextureLoader().getTextureByName(texture);
     //this->texture.setSmooth(true); 
-    singleTextureSize = this->texture.getSize().x / TEXTURE_TILES_PER_ROW; 
+    singleTextureSize = this->texture->getSize().x / TEXTURE_TILES_PER_ROW; 
     renderDataTextures = sf::VertexArray(sf::Quads, width*height*4); 
 
     for (int y = 0; y < height; y++) {
@@ -34,7 +34,7 @@ void GameMap::draw (sf::RenderTarget &target, float delta, bool debug) {
         viewModified = false;
         updateRenderData();
     }
-    target.draw(renderDataTextures, &texture);
+    target.draw(renderDataTextures, texture);
 
     if (debug) {
         sf::Color col = sf::Color(255,255,255,100);

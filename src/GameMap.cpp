@@ -4,6 +4,31 @@
 
 void GameMap::update() {}
 
+
+GameMap::GameMap(Block ** m, int width, int height, std::string texture) {
+    this->width = width; 
+    this->height = height; 
+    
+    map = m; 
+    if (!this->texture.loadFromFile(texture)) { 
+        throw "Could not load texture file " + texture; 
+    } 
+    //this->texture.setSmooth(true); 
+    singleTextureSize = this->texture.getSize().x / TEXTURE_TILES_PER_ROW; 
+    renderDataTextures = sf::VertexArray(sf::Quads, width*height*4); 
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            sf::Vector2i pos(x, y);
+            Block & b = getBlock(pos);
+            if (b.getVisibleAtStart()) {
+                setVisible(pos, true);
+            }
+        }
+    }
+    recalculateConnectedness();
+} 
+
 void GameMap::draw (sf::RenderTarget &target, float delta, bool debug) {
     if (viewModified) {
         viewModified = false;
@@ -28,29 +53,6 @@ void GameMap::draw (sf::RenderTarget &target, float delta, bool debug) {
         target.draw(&vlist[0], vlist.size(), sf::Lines);
     }
 }
-
-GameMap::GameMap(Block ** m, int width, int height, std::string texture) {
-    this->width = width; 
-    this->height = height; 
-    
-    map = m; 
-    if (!this->texture.loadFromFile(texture)) { 
-        throw "Could not load texture file " + texture; 
-    } 
-    //this->texture.setSmooth(true); 
-    singleTextureSize = this->texture.getSize().x / TEXTURE_TILES_PER_ROW; 
-    renderDataTextures = sf::VertexArray(sf::Quads, width*height*4); 
-
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            sf::Vector2i pos(x, y);
-            Block & b = getBlock(pos);
-            if (b.getVisibleAtStart()) {
-                setVisible(pos, true);
-            }
-        }
-    }
-} 
 int GameMap::getHeight() { 
     return height; 
 } 
@@ -139,10 +141,10 @@ int GameMap::getPathLength(sf::Vector2i start, sf::Vector2i target, int exitCond
     return length;
 }
 bool GameMap::connected(sf::Vector2i start, sf::Vector2i target) {
-    return getPathLength(start, target) != -1;
+    return getBlock(start).getConnectedComponent() == getBlock(target).getConnectedComponent();
 }
 bool GameMap::connected(sf::Vector2f start, sf::Vector2f target) {
-    return getPathLength(LocatedEntity::toTile(start), LocatedEntity::toTile(target)) != -1;
+    return connected(LocatedEntity::toTile(start), LocatedEntity::toTile(target));
 }
 int GameMap::getPathLength(sf::Vector2i start, std::vector<sf::Vector2i> targets, int exitConditionLength) {
     int length = -1;
@@ -150,11 +152,17 @@ int GameMap::getPathLength(sf::Vector2i start, std::vector<sf::Vector2i> targets
     return length;
 }
 bool GameMap::connected(sf::Vector2i start, std::vector<sf::Vector2i> targets) {
-    return getPathLength(start, targets) != -1;
+    int cc = getBlock(start).getConnectedComponent();
+    for (auto v : targets) {
+        if (getBlock(v).getConnectedComponent() == cc) {
+            return true;
+        }
+    }
+    return false; 
 }
 
 bool GameMap::connected(sf::Vector2f start, std::vector<sf::Vector2f> targets) {
-    return getPathLength(LocatedEntity::toTile(start), LocatedEntity::toTiles(targets)) != -1;
+    return connected(LocatedEntity::toTile(start), LocatedEntity::toTiles(targets));
 }
 
 sf::Vector2i GameMap::getClosest(sf::Vector2i start, std::vector<sf::Vector2i> targets) {
@@ -332,6 +340,7 @@ void GameMap::destroyWall(sf::Vector2i pos, int & crystalNumber, int & oreNumber
     if (b.isVisible()) {
         setVisible(pos, true);
     }
+    updateConnectedness(pos);
     setModified();
 }
 
@@ -359,6 +368,64 @@ void GameMap::setVisible(sf::Vector2i pos, bool recursionStart) {
     }
     
 }
+
+void GameMap::recalculateConnectedness() {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            Block & block = getBlock(sf::Vector2i(x, y));
+            block.setConnectedComponent(-1);
+        }
+    }
+    int ccIndex = 0;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            sf::Vector2i pos = sf::Vector2i(x, y);
+            Block & block = getBlock(pos);
+            if (block.isWalkable() && block.getConnectedComponent() == -1) {
+                //Discovered a yet undiscovered connected component. 
+                discoverConnectedComponent(pos, -1, ccIndex++);
+            }
+        }
+    }
+}
+
+void GameMap::updateConnectedness(sf::Vector2i pos) {
+    Block & b = getBlock(pos);
+    if (!b.isWalkable()) {
+        return; //This will not ever happen, anyway. 
+    }
+    int cc = b.getConnectedComponent(); //should be -1
+    cc = cc == -1 ? getBlock(pos + sf::Vector2i(0, 1)).getConnectedComponent() : cc;
+    cc = cc == -1 ? getBlock(pos + sf::Vector2i(0, -1)).getConnectedComponent() : cc;
+    cc = cc == -1 ? getBlock(pos + sf::Vector2i(1, 0)).getConnectedComponent() : cc;
+    cc = cc == -1 ? getBlock(pos + sf::Vector2i(-1, 0)).getConnectedComponent() : cc;
+    b.setConnectedComponent(cc);
+    discoverConnectedComponentIfDifferent(pos + sf::Vector2i(0, 1), cc);
+    discoverConnectedComponentIfDifferent(pos + sf::Vector2i(0, -1), cc);
+    discoverConnectedComponentIfDifferent(pos + sf::Vector2i(1, 0), cc);
+    discoverConnectedComponentIfDifferent(pos + sf::Vector2i(-1, 0), cc);
+}
+
+void GameMap::discoverConnectedComponentIfDifferent(sf::Vector2i pos, int expectedConnectedComponent) {
+    Block & b = getBlock(pos);
+    int actualCC = b.getConnectedComponent();
+    if (b.isWalkable() && actualCC != expectedConnectedComponent) {
+        discoverConnectedComponent(pos, actualCC, expectedConnectedComponent);
+    }
+}
+
+void GameMap::discoverConnectedComponent(sf::Vector2i pos, int expectedConnectedComponent, int newConnectedComponent) {
+    Block & b = getBlock(pos);
+    if (b.isWalkable() && b.getConnectedComponent() == expectedConnectedComponent) {
+        b.setConnectedComponent(newConnectedComponent);
+        discoverConnectedComponent(pos + sf::Vector2i(0, 1), expectedConnectedComponent, newConnectedComponent);
+        discoverConnectedComponent(pos + sf::Vector2i(0, -1), expectedConnectedComponent, newConnectedComponent);
+        discoverConnectedComponent(pos + sf::Vector2i(1, 0), expectedConnectedComponent, newConnectedComponent);
+        discoverConnectedComponent(pos + sf::Vector2i(-1, 0), expectedConnectedComponent, newConnectedComponent);
+    }
+}
+
+
 
 /**! Here we assume that you know that this is block actually holds rubble. 
  * Reduces the rubble amount by 1 and turns the block into a normal ground block when all rubble was removed.

@@ -62,7 +62,7 @@ float editorBScrollSinceLastUpdate;
 //!this is closest possible zoom
 #define ZOOM_MIN 0.0025f
 //!this is the most distanced possible zoom
-#define ZOOM_MAX 0.5f
+#define ZOOM_MAX 0.05f
 
 sf::Font mainFont;
 

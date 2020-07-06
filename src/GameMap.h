@@ -115,6 +115,15 @@ class GameMap : public Entity {
         void connectIfFree(Graph & g, sf::Vector2i start, sf::Vector2i* pos, int listSize, bool onlyAverageFirstAndLast);
         //!Very simple and cheap recursive solution to update and propagate new visibility information. But that's it, if the stack is big enough, this works! 
         void setVisible(sf::Vector2i pos, bool recursionStart);
+
+        //If the map changes in some way that does not add a walkable position, this will completely recalculate the connectedness. 
+        void recalculateConnectedness();
+
+        //Quicker update to the connectedness, when the given position was not walkable but is now. 
+        void updateConnectedness(sf::Vector2i pos);
+        //Cheap and simple recursive function to set this (if expected value) and all connected neighboring blocks with one connectedComponent value. 
+        void discoverConnectedComponent(sf::Vector2i pos, int expectedConnectedComponent, int newConnectedComponent);
+        void discoverConnectedComponentIfDifferent(sf::Vector2i pos, int expectedConnectedComponent);
 };
 
 #endif

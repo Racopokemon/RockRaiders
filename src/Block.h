@@ -32,6 +32,7 @@ struct Block {
         BlockType type;
         int metaA, metaB;
         bool visible; 
+        int connectedComponent = -1; 
     public :
         Block() {};
         Block(BlockType type, int metaA, int metaB) {
@@ -122,6 +123,14 @@ struct Block {
         bool isStorageBuilding();
 
         bool isHoldingPickups();
+
+        int getConnectedComponent() {
+            return connectedComponent;
+        }
+
+        void setConnectedComponent(int v) {
+            connectedComponent = v;
+        }
 };
 
 #endif

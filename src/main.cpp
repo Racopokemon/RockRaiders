@@ -339,7 +339,7 @@ int main() {
     World * w = new World("maps/drillMap.txt");
     world = w->ref();
 
-    camCenter = sf::Vector2f(world->getMap()->getWidth()*0.5f, world->getMap()->getHeight()*0.5f);
+    camCenter = world->getMap()->getCameraCenterOnStart();
     updateGameView();
     
     isHalt = true; //Lets don't do any initialization and instead pretend like the game was paused before ... 

@@ -90,6 +90,8 @@ class GameMap : public Entity {
         //Cheap and dirty function that writes the metadata of all blocks into two given locations (expecting that the space is allocated etc.)
         void getEditorData(int * metaA, int* metaB);
 
+        sf::Vector2f getCameraCenterOnStart();
+
     protected : 
 
         int width, height; 
@@ -102,6 +104,7 @@ class GameMap : public Entity {
         //!Set to true, it causes the graph to be regenerated when it is requested the next time
         bool graphModified = true; 
         std::shared_ptr<Graph> graph; 
+        sf::Vector2f cameraCenterOnStart;
 
         void updateRenderData();
         void setModified();

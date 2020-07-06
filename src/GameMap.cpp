@@ -23,6 +23,7 @@ GameMap::GameMap(Block ** m, int width, int height, std::string texture) {
             Block & b = getBlock(pos);
             if (b.getVisibleAtStart()) {
                 setVisible(pos, true);
+                cameraCenterOnStart = LocatedEntity::getTileCenter(pos);
             }
         }
     }
@@ -425,6 +426,9 @@ void GameMap::discoverConnectedComponent(sf::Vector2i pos, int expectedConnected
     }
 }
 
+sf::Vector2f GameMap::getCameraCenterOnStart() {
+    return cameraCenterOnStart;
+}
 
 
 /**! Here we assume that you know that this is block actually holds rubble. 

@@ -430,6 +430,14 @@ sf::Vector2f GameMap::getCameraCenterOnStart() {
     return cameraCenterOnStart;
 }
 
+void GameMap::setGlobalVisibilityForEditor() {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            getBlock(sf::Vector2i(x,y)).setVisible();
+        }
+    }
+    setModified();
+}
 
 /**! Here we assume that you know that this is block actually holds rubble. 
  * Reduces the rubble amount by 1 and turns the block into a normal ground block when all rubble was removed.

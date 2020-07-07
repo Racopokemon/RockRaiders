@@ -12,7 +12,7 @@
  * Every entry in the map is one of the here declared blockTypes. 
  */
 enum BlockType {
-    MASSIVE, HARD, NORMAL_A, NORMAL_B, NORMAL_C, GROUND, RUBBLE, PLATE, BUILDING
+    MASSIVE, HARD, NORMAL_A, NORMAL_B, NORMAL_C, GROUND, RUBBLE, PLATE, BUILDING, WATER, LAVA
 };
 
 //!Up to now, there is only the basic base building where workers store all pickups and get spawned

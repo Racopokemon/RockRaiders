@@ -90,6 +90,8 @@ class GameMap : public Entity {
         //Cheap and dirty function that writes the metadata of all blocks into two given locations (expecting that the space is allocated etc.)
         void getEditorData(int * metaA, int* metaB);
 
+        void setGlobalVisibilityForEditor();
+
         sf::Vector2f getCameraCenterOnStart();
 
     protected : 

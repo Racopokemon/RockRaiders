@@ -30,6 +30,10 @@ Block getBlockFromCharacter(char block) {
         return PLATE;
     case '+':
         return BUILDING;
+    case '~': 
+        return WATER;
+    case '-':
+        return LAVA;
     default:
         std::cout << "WARNING: Char " << block << "does not map to a valid block, replaced with ground\n";
         return GROUND;

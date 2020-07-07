@@ -125,6 +125,7 @@ void initEditor() {
     editorMetaA = new int[editorWidth*editorHeight];
     editorMetaB = new int[editorWidth*editorHeight];
     world->getMap()->getEditorData(editorMetaA, editorMetaB);
+    world->getMap()->setGlobalVisibilityForEditor();
 }
 
 void renderEditor(sf::RenderTarget &target) {
@@ -336,7 +337,7 @@ int main() {
     updateViewport(sf::Vector2f((float)newSize.x, (float)newSize.y));
 
     // The sf::VideoMode class has some interesting static functions to get the desktop resolution, or the list of valid video modes for fullscreen mode. 
-    World * w = new World("maps/drillMap.txt");
+    World * w = new World("maps/level1.txt");
     world = w->ref();
 
     camCenter = world->getMap()->getCameraCenterOnStart();

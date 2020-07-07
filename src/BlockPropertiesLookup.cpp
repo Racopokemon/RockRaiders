@@ -22,8 +22,12 @@ int getTextureNumber(Block b) {
         return 16;
     case BUILDING:
         return 16 + 2;    
+    case WATER:
+        return 4*8+2;
+    case LAVA:
+        return 4*8;
     default:
-        return 8*8-1;
+        return 8*8-1; //Missing texture picture
     }
 }
 

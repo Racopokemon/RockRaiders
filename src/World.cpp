@@ -35,6 +35,8 @@ World::World(std::string mapName) {
                 for (int i = 0; i < w; i++) {
                     Worker * w = new Worker(ref(), map->getRandomPositionInTile(pos, 0.05f));
                     addEntity(w->ref());
+                    workers++; 
+                    //TODO: Once this happens on other places as well, this should be an additional function. 
                 }
             } else if (t == BUILDING) {
                 if (map->isStorageBuilding(pos)) {
@@ -140,11 +142,14 @@ void World::pickupDropped(std::shared_ptr<Pickup> p, bool droppedNew) {
     vi pos = p->getTile();
     if (map->isAbsorbingPickups(pos)) {
         p->requestDeletion();
-        /*
-        if (storageTiles.contains(p->getTile())) {
-            //somehow increase the count or anything
+        if (find(storageTiles.begin(), storageTiles.end(), pos) != storageTiles.end()) {
+                //https://stackoverflow.com/questions/11951121/checking-if-a-pointer-points-to-a-particular-class-c
+                if (dynamic_cast<Crystal*>(p.get())) {
+                    crystals++;
+                } else if (dynamic_cast<Ore*>(p.get())) {
+                    ores++;
+                }
         }
-        */
     } else if (map->isHoldingPickups(pos)) {
         if (!droppedNew) {
             p->cancelJobBySystem();
@@ -163,4 +168,10 @@ GameMap * World::getMap() {
 
 std::shared_ptr<World> World::ref() {
     return reference;
+}
+
+void World::getGameStatPointers(int ** crystals, int ** ores, int ** workers) {
+    *crystals = &this->crystals;
+    *ores = &this->ores;
+    *workers = &this->workers;
 }

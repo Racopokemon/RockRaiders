@@ -68,6 +68,8 @@ class World {
         //cancel their jobs (... maybe) and then finally we can self-destruct with reference.reset()
         void deleteWorld();
 
+        void getGameStatPointers(int ** crystals, int ** ores, int ** workers);
+
     protected : 
 
         void pickupDropped(std::shared_ptr<Pickup> p, bool droppedNew);
@@ -81,6 +83,10 @@ class World {
         std::unique_ptr<TileJobs> tileJobs;
         
         std::shared_ptr<World> reference;
+
+        int workers = 0;
+        int crystals = 0;
+        int ores = 0;
 };
 
 #endif

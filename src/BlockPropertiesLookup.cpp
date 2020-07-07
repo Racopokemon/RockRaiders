@@ -106,6 +106,9 @@ bool getBlockAbsorbingPickups(Block b) {
     {
     case BUILDING:
         return b.getBuildingType() == BASE;
+    case LAVA:
+    case WATER:
+        return true;
     }
     return false; 
 }

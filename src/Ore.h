@@ -10,7 +10,7 @@ class Ore : public Pickup {
     public :
 
         Ore(std::shared_ptr<World> w, sf::Vector2f pos, bool startsAsCarried) : Pickup(w, pos, startsAsCarried) {
-            texture = TextureLoader::getTextureByName("img/ore.png");
+            texture = TextureLoader::getTextureByName(TEXTURE_NAME_ORE);
             texture->setSmooth(true);
         };
 

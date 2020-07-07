@@ -7,6 +7,9 @@
 #include "TestEntity.h"
 #include "World.h"
 #include "LocatedEntity.h" //Temp actually
+#include "GameStatDisplay.h"
+#include "TextureLoader.h"
+#include "Colors.h"
 
 //This is the pretty messy main file. Better take a look at the other, way more structured files ;)
 
@@ -54,6 +57,7 @@ bool lastFirstDown;
 float editorAScrollSinceLastUpdate;
 float editorBScrollSinceLastUpdate;
 
+GameStatDisplay gameStatDisplay;
 
 #define BUTTON_SPACE 100.f
 #define BUTTON_INSET 5.f
@@ -64,7 +68,7 @@ float editorBScrollSinceLastUpdate;
 //!this is the most distanced possible zoom
 #define ZOOM_MAX 0.05f
 
-sf::Font mainFont;
+sf::Font * mainFont;
 
 void onMapClicked(sf::Vector2f pos) {
     //Here we might first check whether there was an entity that we clicked. 
@@ -134,7 +138,7 @@ void renderEditor(sf::RenderTarget &target) {
         for (int x = 0; x < editorWidth; x++) {
             std::string print = std::to_string(editorMetaA[i]) + ", " + std::to_string(editorMetaB[i]);
             sf::Text text;
-            text.setFont(mainFont);
+            text.setFont(*mainFont);
             text.setString(print);
             text.setCharacterSize(20.f);
             text.setPosition(sf::Vector2f(x + 0.2f, y+0.2f));
@@ -246,7 +250,7 @@ void update() {
 
 void drawText(std::string s, sf::Vector2f pos) {
     sf::Text text;
-    text.setFont(mainFont);
+    text.setFont(*mainFont);
     text.setString(s);
     text.setCharacterSize(18);
     text.setPosition(pos);
@@ -256,6 +260,7 @@ void drawText(std::string s, sf::Vector2f pos) {
 
 //Screen Coordinates here span from 0 to windowSize.x and 0 to windowSize.y
 void renderHUD() {
+    gameStatDisplay.draw(*target);
     if (debugMode) {
         drawText("FPS: " + std::to_string(lastFPS), sf::Vector2f(10.f, 20.f));
         drawText("TPS: " + std::to_string(tps), sf::Vector2f(10.f, 38.f));
@@ -270,7 +275,7 @@ void renderHUD() {
 //Screen coordinates are scaled so that one button has the size of BUTTON_SPACE, and from origin at top x left
 void renderMenu() {
     sf::RectangleShape shade(sf::Vector2f(BUTTON_SPACE, windowSize.y));
-    shade.setFillColor(sf::Color(0,0,0,150));
+    shade.setFillColor(COLORS_TRANS_BACK);
     target->draw(shade);
     //Temp of course
     for (int i = 0; i < 4; i++) {
@@ -323,9 +328,7 @@ int main() {
 
     sf::Vector2i newSize(800, 600);
 
-    if (!mainFont.loadFromFile("fonts/redline.ttf")) {
-        std::cout << "Could not load font file. ";
-    }
+    mainFont = TextureLoader::getFont();
 
     sf::ContextSettings contextSetting;
     contextSetting.antialiasingLevel = 8;
@@ -337,12 +340,14 @@ int main() {
     updateViewport(sf::Vector2f((float)newSize.x, (float)newSize.y));
 
     // The sf::VideoMode class has some interesting static functions to get the desktop resolution, or the list of valid video modes for fullscreen mode. 
-    World * w = new World("maps/level1.txt");
+    World * w = new World("maps/drillMap.txt");
     world = w->ref();
 
     camCenter = world->getMap()->getCameraCenterOnStart();
     updateGameView();
-    
+
+    gameStatDisplay = GameStatDisplay(world, &windowSize);
+
     isHalt = true; //Lets don't do any initialization and instead pretend like the game was paused before ... 
     //so all initialization is done by itself in the next update when it is confronted with continuing the loop
     updateGameSpeed(false, 60);

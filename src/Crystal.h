@@ -9,7 +9,7 @@ class Crystal : public Pickup {
     public :
     
         Crystal(std::shared_ptr<World> w, sf::Vector2f pos, bool startsAsCarried) : Pickup(w, pos, startsAsCarried) {
-            texture = TextureLoader::getTextureByName("img/crystal.png");
+            texture = TextureLoader::getTextureByName(TEXTURE_NAME_CRYSTAL);
             texture->setSmooth(true);
         };
 

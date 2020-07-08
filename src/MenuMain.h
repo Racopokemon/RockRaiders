@@ -13,7 +13,7 @@ class MenuMain : public Menu {
 
         virtual void init() {
 
-            Button b(doNothing, "Does... nothing. ", TextureLoader::getTextureByName("img/map.png"));
+            Button b(doNothing, "Does... nothing. ", ICON_1);
 
             addButtonAtTop(b);
             addButtonAtTop(b);

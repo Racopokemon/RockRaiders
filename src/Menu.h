@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "Button.h"
 #include <iostream>
+#include "IconLookup.h" //Just for convenience for all implementing menus
 
 #define MENU_SPACE 5.f
 #define MENU_WIDTH (BUTTON_SIZE+MENU_SPACE*2)

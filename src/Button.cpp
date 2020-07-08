@@ -8,7 +8,7 @@ Button::Button(void (*clickAction)(ButtonContext context), std::string descripti
     this->description = description;
     this->texture = TextureLoader::getTextureByName(TEXTURE_NAME_ICONS);
     texture->setSmooth(true);
-    tile = getIconTileFromIndex(iconIndex);
+    tile = IconLookup::getIconTileFromIndex(iconIndex, texture->getSize().x);
 }
 
 void scaleToWidth(sf::Sprite & s, float w) {

@@ -38,7 +38,7 @@ class Button {
         int spawnIndex;
         sf::FloatRect rect;
         std::string description;
-        sf::FloatRect tile;
+        sf::IntRect tile;
         sf::Texture * texture; 
         void (*clickFunction)(ButtonContext context);
 

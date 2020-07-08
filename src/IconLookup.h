@@ -13,10 +13,9 @@
 
 #include <SFML/Graphics.hpp>
 
-sf::FloatRect getIconTileFromIndex(int i, int textureWidth) {
-    int tileSize = textureWidth / ICON_LOOKUP_TILE_COUNT;
-    return sf::FloatRect((i % ICON_LOOKUP_TILE_COUNT) + 0.5f, (i / ICON_LOOKUP_TILE_COUNT) + 0.5f, tileSize - 1, tileSize - 1);
-}
-
+class IconLookup {
+    public : 
+        static sf::IntRect getIconTileFromIndex(int i, int textureWidth);
+};
 
 #endif

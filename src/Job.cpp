@@ -8,7 +8,7 @@ Job::Job(std::shared_ptr<World> w) {
 
 void Job::onJobStarted(std::shared_ptr<JobDoer> jd) {
     if (doer) {
-        throw std::runtime_error("Job was started ... but there is already a JobDoer assigned to us! ");
+        throw std::exception("Job was started ... but there is already a JobDoer assigned to us! ");
     }
     doer = jd; 
     callNumber = -1;

@@ -30,7 +30,7 @@ class JobDrill : public Job {
                 world->destroyWall(target);
                 doer->onJobFinished();//this might kill us, lets do all important things before!
             } else {
-                throw std::runtime_error("onActionFinished called a 4th time on a JobDrill");
+                throw std::exception("onActionFinished called a 4th time on a JobDrill");
             }
         }
         void onCancelledByUser() {

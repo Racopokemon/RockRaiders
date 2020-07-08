@@ -1,10 +1,8 @@
 //This is the pretty messy main file. Better take a look at the other, way more structured files ;)
 
-
 #include "main.h"
 
 #include <iostream>
-//#include "SFML/Window.hpp"
 #include "SFML/Graphics.hpp"
 #include <SFML/System.hpp>
 #include "TestEntity.h"
@@ -15,9 +13,11 @@
 #include "Colors.h"
 #include "Menu.h"
 #include "MenuMain.h"
-
+#include "MenuLevelSelect.h"
 
 std::vector<std::shared_ptr<Entity>> entities;
+//!The all-deciding world. If its set (just check if (world) {}), were currently playing this level. If not, were in the main menu. 
+//Exit or load simply with loadLevel and exitLevel. 
 std::shared_ptr<World> world; 
 
 bool isHalt, shouldHalt;
@@ -45,7 +45,7 @@ sf::View menuView;
 sf::Vector2f windowSize(1.f,1.f);
 
 sf::Vector2f camCenter; //Thinking strictly, this is redundant, since the center is also contained in the gameView. However, this is always the right vaule, the gameView then gets updated to fit to this. 
-float camZoom = 0.01f; //Considering that with a 1 to 1 zoom every tile was only one pixel big, and this being the factor multiplied to the window size to determine the visible area
+float camZoom; //Considering that with a 1 to 1 zoom every tile was only one pixel big, and this being the factor multiplied to the window size to determine the visible area
 
 sf::RenderWindow * gameWindow;
 sf::RenderTarget * target;
@@ -69,6 +69,7 @@ GameStatDisplay gameStatDisplay;
 #define ZOOM_MIN 0.0025f
 //!this is the most distanced possible zoom
 #define ZOOM_MAX 0.05f
+#define ZOOM_DEFAULT 0.007f;
 
 Menu * menu;
 
@@ -128,6 +129,12 @@ void capZoom() {
     }
 }
 
+void enterLevelSelect() {
+    //Maybe we get here more in the future. 
+    //But be aware, that in the case we swap between levels instantly, this might not very long. 
+    setMenu<MenuLevelSelect>();
+}
+
 void initEditor() {
     debugMode = true;
     updateTime = -1;
@@ -138,6 +145,8 @@ void initEditor() {
     editorMetaB = new int[editorWidth*editorHeight];
     world->getMap()->getEditorData(editorMetaA, editorMetaB);
     world->getMap()->setGlobalVisibilityForEditor();
+    editorAScrollSinceLastUpdate = 0;
+    editorBScrollSinceLastUpdate = 0;
 }
 
 void renderEditor(sf::RenderTarget &target) {
@@ -196,6 +205,15 @@ void printEditor() {
         }
         std::cout << std::endl;
     }
+}
+
+void exitEditor() {
+    if (!editor) {
+        return;
+    }
+    delete[editorWidth*editorHeight] editorMetaA;
+    delete[editorWidth*editorHeight] editorMetaB;
+    editor = false;
 }
 
 //The bad, not deterministic menu handling is here. Totally dependent on the frames, called before every single render. 
@@ -282,7 +300,9 @@ void drawText(std::string s, sf::Vector2f pos) {
 
 //Screen Coordinates here span from 0 to windowSize.x and 0 to windowSize.y
 void renderHUD() {
-    gameStatDisplay.draw(*target);
+    if (world) {
+        gameStatDisplay.draw(*target);
+    }
     if (debugMode) {
         drawText("FPS: " + std::to_string(lastFPS), sf::Vector2f(10.f, 20.f));
         drawText("TPS: " + std::to_string(tps), sf::Vector2f(10.f, 38.f));
@@ -348,29 +368,15 @@ int main() {
     mainFont = TextureLoader::getFont();
 
     sf::ContextSettings contextSetting;
-    contextSetting.antialiasingLevel = 8;
+    contextSetting.antialiasingLevel = 4;
     sf::RenderWindow window(sf::VideoMode(newSize.x,newSize.y), "RockRaiders", sf::Style::Default, contextSetting);
     window.setKeyRepeatEnabled(false);
     gameWindow = &window;
     target = &window; //If we at some point decide to draw into an image instead ... were prepared! 
 
-
-    World * w = new World("maps/drillMap.txt");
-    world = w->ref();
-
-    camCenter = world->getMap()->getCameraCenterOnStart();
-    updateGameView();
-
-    gameStatDisplay = GameStatDisplay(world, &windowSize);
-    setMenu<MenuMain>();
-
     updateViewport(sf::Vector2f((float)newSize.x, (float)newSize.y));
 
-    isHalt = true; //Lets don't do any initialization and instead pretend like the game was paused before ... 
-    //so all initialization is done by itself in the next update when it is confronted with continuing the loop
-    updateGameSpeed(false, 60);
-
-    timePassedSinceLastSecond = zeroTime;
+    enterLevelSelect();
 
     sf::Clock clock;
     sf::Clock FPSClock;
@@ -397,6 +403,9 @@ int main() {
                 }
                 break;
             case sf::Event::KeyPressed:
+                if (!world) {
+                    break;
+                }
                 if (!editor) {
                     if (event.key.code == sf::Keyboard::Tab) {
                         editor = true; 
@@ -439,34 +448,44 @@ int main() {
             }
         }
         
-        //guiTick-Dependent Render (and Update) step
-        if (isHalt) {
-            if (!shouldHalt) {
-                isHalt = false;
-                currentFrameLength = nextFrameLength;
-                update();
-                render(0.f);
-                timePassedSinceFrameStart = zeroTime;
-                clock.restart();
-            } else {
-                render(1.f);
-            }
-        } else {
-            sf::Time timePassed = clock.restart();
-            timePassedSinceFrameStart += timePassed;
-            if (timePassedSinceFrameStart > currentFrameLength) {
-                if (shouldHalt) {
-                    isHalt = true;
-                    timePassedSinceFrameStart = currentFrameLength;
+        if (world) {
+
+            //tick-Dependent Render (and Update) step:
+            if (isHalt) {
+                if (!shouldHalt) {
+                    isHalt = false;
+                    currentFrameLength = nextFrameLength;
+                    update();
+                    render(0.f);
+                    timePassedSinceFrameStart = zeroTime;
+                    clock.restart();
                 } else {
-                    while(timePassedSinceFrameStart > currentFrameLength) {
-                        update();
-                        timePassedSinceFrameStart -= currentFrameLength;
-                        currentFrameLength = nextFrameLength;
+                    render(1.f);
+                }
+            } else {
+                sf::Time timePassed = clock.restart();
+                timePassedSinceFrameStart += timePassed;
+                if (timePassedSinceFrameStart > currentFrameLength) {
+                    if (shouldHalt) {
+                        isHalt = true;
+                        timePassedSinceFrameStart = currentFrameLength;
+                    } else {
+                        while(timePassedSinceFrameStart > currentFrameLength) {
+                            update();
+                            timePassedSinceFrameStart -= currentFrameLength;
+                            currentFrameLength = nextFrameLength;
+                        }
                     }
                 }
+                render(timePassedSinceFrameStart/currentFrameLength);
             }
-            render(timePassedSinceFrameStart/currentFrameLength);
+            //This was the interesting part here. 
+            //Coming in here newly requires that you set timePassedSinceFrameStart to zeroTime 
+            //and set currentFrameLength to nextFrameLength, after calling updateGameSpeed
+            
+
+        } else {
+            render(1.f);
         }
 
         //Independent FPS Counter step
@@ -498,10 +517,57 @@ void setMenu() {
 }
 
 void exitLevel() {
+    if (!world) {
+        return;
+    }
+    if (editor) {
+        exitEditor();
+    }
     std::cout << "Now we START deleting the world" << std::endl;
     world->deleteWorld();
-    std::cout << "This should kill the world" << std::endl;
+    std::cout << "This should now kill the world" << std::endl;
     world.reset();
     std::cout << "Now we have FINISHED deleting the world" << std::endl;
-    exit(0);
+    enterLevelSelect();
+}
+
+void setWorld(std::string name) {
+
+    if (world) {
+        std::cout << "Woah dude, you got nerves instantly loading a new level without quitting the old one ... but hey, I am pretty confident that this will just work with no problem!" << std::endl;
+        exitLevel();
+    }
+
+    World * w;
+    try {
+        w = new World(name);
+    } catch (std::exception& e) {
+        std::cout << "Could not load level. " << std::endl << e.what() << std::endl;
+        return;
+    }
+    
+    world = w->ref();
+
+    camCenter = world->getMap()->getCameraCenterOnStart();
+    camZoom = ZOOM_DEFAULT;
+    updateGameView();
+
+    gameStatDisplay = GameStatDisplay(world, &windowSize);
+
+    isHalt = true; //Lets don't do any initialization and instead pretend like the game was paused before ... 
+    //so all initialization is done by itself in the next update when it is confronted with continuing the loop
+    updateGameSpeed(false, 60);
+
+    timePassedSinceLastSecond = zeroTime;
+
+
+
+    scrollSinceLastUpdate = 0;
+    lastFirstDown = false;
+}
+
+
+//Just a redirect, to the outside we load levels, on the inside, everything depends on the world being set or not, so its just naming. 
+void loadLevel(std::string name) {
+    setWorld(name);
 }

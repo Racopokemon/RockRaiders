@@ -27,8 +27,9 @@ class Pickup : public LocatedEntity {
         void update();
 
         //!The name indicates it: JobDoers decide to pick up a Pickup
-        //This only happens due to the JobPickup connected to this Pickup, and that is being finished 
-        //when the Pickup happened - so a Pickup forgets its Job here. 
+        //This only happens due to the JobPickup connected to this Pickup, ~~and that is being finished 
+        //when the Pickup happened - so a Pickup forgets its Job here.~~ actually we don't delete the job on ourself, thats done by the job with unset job,
+        //we have weird consistency errors when the pickup doesn't know its job anymore but the doer cancels the job which wahts to delete the job on us
         void bePickedUpBy(std::shared_ptr<JobDoer> j); 
         //!The name indicates it: JobDoers decide to drop a Pickup
         //A freshly dropped Pickup notifies the world about being dropped
@@ -51,7 +52,8 @@ class Pickup : public LocatedEntity {
 
         //!Requires that there is already a job set - and in the case someone decides that another job
         //is better to pick this pickup up, then this function will just forget the current job, without
-        //calling anything on it. 
+        //calling anything on it. [The one calling this takes responsibility to assign a new job, should 
+        //only be done by a job that is responsible about this from the beginning]
         void unsetJob();
 
         //!Needed by the world, when the ground changes and ... maybe we need a new job assigned, but maybe there is already

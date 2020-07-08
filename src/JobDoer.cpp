@@ -80,7 +80,7 @@ std::shared_ptr<Pickup> JobDoer::getPickup() {
 
 void JobDoer::setJob(std::shared_ptr<Job> j) {
     if (job) {
-        throw new std::runtime_error("Tried to assign a job to a JobDoer that still has a job");
+        throw new std::exception("Tried to assign a job to a JobDoer that still has a job");
     }
     jobCancelled = false; 
     job = j;
@@ -93,7 +93,7 @@ void printVector(sf::Vector2i v) {
 
 void JobDoer::walkTo(sf::Vector2f v) {
     if (JOB_DOER_BUSY) {
-        throw std::runtime_error("WalkTo called on JobDoer, that was still busy with another task");
+        throw std::exception("WalkTo called on JobDoer, that was still busy with another task");
     }
     state = walking; 
     starting = true; 
@@ -107,7 +107,7 @@ void JobDoer::walkTo(sf::Vector2f v) {
 }
 void JobDoer::playAnimation(std::string s, void * data) {
     if (JOB_DOER_BUSY) {
-        throw std::runtime_error("playAnimation called on JobDoer, that was still busy with another task");
+        throw std::exception("playAnimation called on JobDoer, that was still busy with another task");
     }
     state = animation;
     starting = true;
@@ -117,7 +117,7 @@ void JobDoer::playAnimation(std::string s, void * data) {
 }
 void JobDoer::pickUpAnimation(std::shared_ptr<Pickup> p) {
     if (JOB_DOER_BUSY) {
-        throw std::runtime_error("pickUpAnimation called on JobDoer, that was still busy with another task");
+        throw std::exception("pickUpAnimation called on JobDoer, that was still busy with another task");
     }
     state = animation;
     starting = true;
@@ -128,7 +128,7 @@ void JobDoer::pickUpAnimation(std::shared_ptr<Pickup> p) {
 //!Inits animation "drop" and afterwards drop()s the Pickup.
 void JobDoer::dropAnimation() {
     if (JOB_DOER_BUSY) {
-        throw std::runtime_error("dropAnimation called on JobDoer, that was still busy with another task");
+        throw std::exception("dropAnimation called on JobDoer, that was still busy with another task");
     }
     state = animation;
     starting = true;
@@ -137,7 +137,7 @@ void JobDoer::dropAnimation() {
 }
 void JobDoer::onJobFinished() {
     if (state != waiting && state != idle) {
-        throw std::runtime_error("onJobFinished called on JobDoer, but we were still busy with some action! ");
+        throw std::exception("onJobFinished called on JobDoer, but we were still busy with some action! ");
     }
     job->deleteLastReference();
     job.reset();
@@ -146,7 +146,7 @@ void JobDoer::onJobFinished() {
 
 void JobDoer::setNextJob(std::shared_ptr<Job> j) {
     if (JOB_DOER_BUSY) {
-        throw std::runtime_error("setNextJob called on JobDoer, that was still busy with a task");
+        throw std::exception("setNextJob called on JobDoer, that was still busy with a task");
     }
     job->deleteLastReference(); //This actually deletes the Job. Done in here so that it doesnt need to be written in every subclass of Job. 
     job.reset();
@@ -156,7 +156,7 @@ void JobDoer::setNextJob(std::shared_ptr<Job> j) {
 
 void JobDoer::pickUp(std::shared_ptr<Pickup> p) {
     if (pickup) {
-        throw new std::runtime_error("Tried to have a JobDoer pickup a Pickup ... but it already carries a Pickup.");
+        throw new std::exception("Tried to have a JobDoer pickup a Pickup ... but it already carries a Pickup.");
     }
     pickup = p;
     p->bePickedUpBy(std::dynamic_pointer_cast<JobDoer>(ref()));

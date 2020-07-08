@@ -28,10 +28,10 @@ class JobPickup : public Job {
             } else if (callNumber == 1) {
                 doer->pickUpAnimation(pickup);
             } else if (callNumber == 2) {
-                //Pickups already drop their reference to their job when they get picked up. 
+                pickup->unsetJob();
                 doer->onJobFinished();
             } else {
-                throw std::runtime_error("onActionFinished called a 4th time on a JobPickup");
+                throw std::exception("onActionFinished called a 4th time on a JobPickup");
             }
         } 
 

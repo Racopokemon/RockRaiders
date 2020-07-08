@@ -14,7 +14,7 @@ void readNextNotCommentedLine(std::ifstream & fin, char* buffer) {
             break;
         }
         if (fin.eof()) {
-            throw std::runtime_error("Could not read next line in file. :(");
+            throw std::exception("Could not read next line in file. :(");
         }
     }
 }
@@ -51,7 +51,7 @@ std::shared_ptr<GameMap> loadFromFile(std::string file) {
     std::ifstream fin;
     fin.open(file.c_str());
     if (!fin.is_open()) {
-        throw std::runtime_error("Could not open map file :(");
+        throw std::exception("Could not open map file :(");
     }
 
     char buffer[MAX_LINE_SIZE];
@@ -78,7 +78,7 @@ std::shared_ptr<GameMap> loadFromFile(std::string file) {
     for (int i = 0; i < height; i++) {
         std::string line = lines[i];
         if (line.size() != width) {
-            throw std::runtime_error("Invalid level file, not uniform line lengths in the main map part (with the characters)");
+            throw std::exception("Invalid level file, not uniform line lengths in the main map part (with the characters)");
         }
         for  (int j = 0; j < width; j++) {
             map[j][i] = Block(getBlockFromCharacter(line[j]));

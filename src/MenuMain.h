@@ -1,14 +1,12 @@
 #ifndef MENU_MAIN_H
 #define MENU_MAIN_H
 
-#include "Menu.h"
 #include <iostream>
-#include "TextureLoader.h"
+#include "Menu.h"
 #include "main.h"
 
 class MenuMain : public Menu {
     public : 
-        //MenuMain() {};
         MenuMain(ButtonContext context) : Menu(context) {};
         virtual ~MenuMain() {std::cout << "MenuMain deleted" << std::endl;}
 

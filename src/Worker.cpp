@@ -7,7 +7,7 @@ Worker::Worker(std::shared_ptr<World> w, sf::Vector2f spawnPos) : JobDoer(w) {
 
 void Worker::initPath() {
     if (path.empty()) {
-        throw std::runtime_error("Holy moly how can the path be empty, we even checked before in the JobDoer!!");
+        throw std::exception("Holy moly how can the path be empty, we even checked before in the JobDoer!!");
     }
     if (path.size() == 1) {
         //Only Fine-Tuning

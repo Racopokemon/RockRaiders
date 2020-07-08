@@ -35,7 +35,7 @@ bool Entity::getDeleteRequested() {
 
 std::shared_ptr<Entity> Entity::ref() {
     if (!reference || deleteRequested) {
-        throw new std::runtime_error("After an Entity requested to delete itself, there was still a request for a new reference. Has one never before created, or is someone still working with this?");
+        throw new std::exception("After an Entity requested to delete itself, there was still a request for a new reference. Has one never before created, or is someone still working with this?");
     }
     return reference;
 }

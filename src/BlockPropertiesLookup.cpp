@@ -96,7 +96,7 @@ int getBlockWallStrength(Block b) {
     case HARD:
         return HARD_STRENGTH;
     default:
-        throw std::runtime_error("Requested the strength of a block that is not a breakable wall");
+        throw std::exception("Requested the strength of a block that is not a breakable wall");
         return -1;
     }
 }

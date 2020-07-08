@@ -23,14 +23,14 @@ void TileJobs::deleteWall(sf::Vector2i w) {
 
 void TileJobs::setJobDrill(sf::Vector2i w, std::shared_ptr<JobDrill> j) {
     if (get(w).drill) {
-        throw std::runtime_error("Tried to store a jobDrill for a tile that already has such a job!");
+        throw std::exception("Tried to store a jobDrill for a tile that already has such a job!");
     }
     get(w).drill = j;
 }
 
 void TileJobs::unsetJobDrill(sf::Vector2i w) {
     if (!get(w).drill) {
-        throw std::runtime_error("Someone finished a drill job ... that was not even set..");
+        throw std::exception("Someone finished a drill job ... that was not even set..");
     }
     get(w).drill.reset();
 }

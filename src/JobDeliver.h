@@ -38,7 +38,7 @@ class JobDeliver : public Job {
                 world->getTileJobs()->removeJobDeliver(targetTile, std::dynamic_pointer_cast<JobDeliver>(ref()));
                 doer->onJobFinished();
             } else {
-                throw std::runtime_error("onActionFinished called a 4th time on JobDeliver");
+                throw std::exception("onActionFinished called a 4th time on JobDeliver");
             }
         }
 

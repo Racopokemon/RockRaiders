@@ -11,10 +11,10 @@ Pickup::Pickup(std::shared_ptr<World> w, sf::Vector2f pos, bool startsAsCarried)
 
 void Pickup::bePickedUpBy(std::shared_ptr<JobDoer> j) {
     if (carrier) {
-        throw new std::runtime_error("Wanted to pick up a Pickup that already is picked up by a JobDoer");
+        throw new std::exception("Wanted to pick up a Pickup that already is picked up by a JobDoer");
     }
     if (job) {
-        job.reset();
+        //job.reset();
     } else {
         std::cout << "Sure that it makes any sense that this pickup was picked up ... without a job assigned to pick it up? Looks like an error!" << std::endl;
     }
@@ -23,7 +23,7 @@ void Pickup::bePickedUpBy(std::shared_ptr<JobDoer> j) {
 
 void Pickup::beDropped() {
     carrier.reset();
-    job.reset(); //Shouldn't do anything anymore, we lose the job reference already as soon as someone picks us up
+    //job.reset(); //Shouldn't do anything anymore, we lose the job reference already as soon as someone picks us up
     if (!getDeleteRequested()) {//This check is important, since we end up in here also when our deletion is requested. 
         world->pickupDropped(std::dynamic_pointer_cast<Pickup>(ref()));
     }
@@ -65,14 +65,14 @@ void Pickup::cancelJobBySystem() {
 
 void Pickup::setJob(std::shared_ptr<JobPickup> p) {
     if (job) {
-        throw new std::runtime_error("Tried to setJob on a pickup, that already has a job assigned!");
+        throw new std::exception("Tried to setJob on a pickup, that already has a job assigned!");
     }
     job = p;
 }
 
 void Pickup::unsetJob() {
     if (!job) {
-        throw new std::runtime_error("Tried to change the job, but there was no one assigned before");
+        throw new std::exception("Tried to change the job, but there was no one assigned before");
     }
     job.reset();
 }

@@ -23,8 +23,10 @@ void Pickup::bePickedUpBy(std::shared_ptr<JobDoer> j) {
 
 void Pickup::beDropped() {
     carrier.reset();
-    job.reset(); //Shouldn't do anything anymore, we 
-    world->pickupDropped(std::dynamic_pointer_cast<Pickup>(ref()));
+    job.reset(); //Shouldn't do anything anymore, we lose the job reference already as soon as someone picks us up
+    if (!getDeleteRequested()) {//This check is important, since we end up in here also when our deletion is requested. 
+        world->pickupDropped(std::dynamic_pointer_cast<Pickup>(ref()));
+    }
 }
 
 void Pickup::update() {

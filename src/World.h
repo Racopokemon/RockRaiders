@@ -26,7 +26,7 @@ class World {
     public : 
 
         World(std::string mapName);
-        ~World();
+        virtual ~World();
 
         //! The mastermind of job scheduling. 
         //Here we assign a job to the JobDoer, that he is able to perform (also reachable etc.)
@@ -66,6 +66,7 @@ class World {
         //!Has yet to be implemented, how to do this, where, etc. 
         //We should start clearing (deleting) all Entities, who will then also somehow
         //cancel their jobs (... maybe) and then finally we can self-destruct with reference.reset()
+        //Also clears the entities list. 
         void deleteWorld();
 
         void getGameStatPointers(int ** crystals, int ** ores, int ** workers);

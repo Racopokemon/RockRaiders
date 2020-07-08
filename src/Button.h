@@ -4,7 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include "World.h"
 
-#define BUTTON_SIZE 110.f
+#define BUTTON_SIZE 80.f
+#define BUTTON_TEXT_DISTANCE 15.f
 
 enum ButtonState {
     NORMAL, HOVER, PRESSED, PRESSED_BUT_LEFT
@@ -40,6 +41,7 @@ class Button {
         std::string description;
         sf::IntRect tile;
         sf::Texture * texture; 
+        sf::Font * font;
         void (*clickFunction)(ButtonContext context);
 
 };

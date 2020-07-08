@@ -496,3 +496,12 @@ void setMenu() {
     menu = new T (context);
     menu->afterCreated(height);
 }
+
+void exitLevel() {
+    std::cout << "Now we START deleting the world" << std::endl;
+    world->deleteWorld();
+    std::cout << "This should kill the world" << std::endl;
+    world.reset();
+    std::cout << "Now we have FINISHED deleting the world" << std::endl;
+    exit(0);
+}

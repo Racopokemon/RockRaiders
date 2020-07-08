@@ -88,5 +88,7 @@ std::shared_ptr<GameMap> loadFromFile(std::string file) {
     fillInMeta(fin, map, buffer, width, height, true);
     fillInMeta(fin, map, buffer, width, height, false);
 
-    return std::make_shared<GameMap>(map, width, height, textureName);
+    GameMap * gameMap = new GameMap(map, width, height, textureName);
+
+    return std::dynamic_pointer_cast<GameMap>(gameMap->ref());
 }

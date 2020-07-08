@@ -9,6 +9,7 @@ Button::Button(void (*clickAction)(ButtonContext context), std::string descripti
     this->texture = TextureLoader::getTextureByName(TEXTURE_NAME_ICONS);
     texture->setSmooth(true);
     tile = IconLookup::getIconTileFromIndex(iconIndex, texture->getSize().x);
+    font = TextureLoader::getFont();
 }
 
 void scaleToWidth(sf::Sprite & s, float w) {
@@ -24,7 +25,7 @@ void Button::draw(sf::RenderTarget & target, sf::Time time, ButtonState state) {
 
     sf::Sprite s(*texture, tile);
     s.setOrigin(sf::Vector2f(s.getLocalBounds().width*0.5f, s.getLocalBounds().height*0.5f));
-    scaleToWidth(s, BUTTON_SIZE * 0.8f);
+    scaleToWidth(s, BUTTON_SIZE * 0.75f);
 
     sf::Transform trans;
     trans.translate(BUTTON_SIZE*0.5f, BUTTON_SIZE*0.5f);
@@ -48,6 +49,15 @@ void Button::draw(sf::RenderTarget & target, sf::Time time, ButtonState state) {
 
     if (state != NORMAL) {
         //Draw Description to the left, but ignoring (!) the random transform
+        sf::Text text;
+        text.setString(description);
+        text.setFillColor(COLORS_BUTTON_TEXT);
+        text.setFont(*font);
+        text.setCharacterSize(14);
+        sf::FloatRect b = text.getLocalBounds();
+        text.setOrigin(b.left + b.width - b.height * 0.5f, b.top + b.height * 0.5f);
+        text.setPosition(rect.left - BUTTON_TEXT_DISTANCE, rect.top + rect.height * 0.5f);
+        target.draw(text);
     }
 
     if (time < sf::seconds(1)) { 

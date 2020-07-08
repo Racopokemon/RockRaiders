@@ -175,3 +175,42 @@ void World::getGameStatPointers(int ** crystals, int ** ores, int ** workers) {
     *ores = &this->ores;
     *workers = &this->workers;
 }
+
+void World::deleteWorld() {
+    //Better not look too close at this hacky function that hopefully gets all circular references erased without causing trouble
+
+
+    //Let's try to cancel as many jobs by system as possible: 
+
+    //We delete all pickups, if theyre on the ground, this cancels their jobs (but they keep inside the Jobs list, because usually we delete them first)
+    //If they are being carried, they are dropped and ~~create even new jobs to pick them up~~ that was an issue in general and is fixed now
+    for (std::shared_ptr<Entity> e : entities) { //Yess, this is a hack, were directly using the list from main.cpp. 
+        //But for later, we earlier or later needed access to this anyway, we might change this later (but only a bit, giving a pointer)
+        if (std::shared_ptr<Pickup> p = std::dynamic_pointer_cast<Pickup>(e)) {
+            p->requestDeletion();
+        }
+    }
+    //Easy thing with TileJobs: 
+    tileJobs->cancelAllJobs();
+
+    //The only jobs that remain after this are JobWalks. 
+    for (std::shared_ptr<Entity> e : entities) { //Yess, this is a hack, were directly using the list from main.cpp. 
+        //But for later, we earlier or later needed access to this anyway, we might change this later (but only a bit, giving a pointer)
+        if (std::shared_ptr<JobDoer> p = std::dynamic_pointer_cast<JobDoer>(e)) {
+            p->requestDeletion(); //By now: The only remaining walk jobs are not recovered
+        }
+    }
+
+    //Only thing left are (not yet assigned) JobWalks, and they don't point anywhere
+    jobList.clear();
+
+    //Looking closely, it should actually not matter much in which order I delete the elements out of the entities vector, they should all be able to manage this properly. 
+    //The situation we avoided is deleting workers who carry pickups that would then still request a new job after they got dropped forcefully
+
+    entities.clear();
+
+    map->requestDeletion();
+    map.reset();
+
+    reference.reset();
+}

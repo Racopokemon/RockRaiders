@@ -6,6 +6,7 @@ class Job;
 class Pickup;
 class World;
 #include "LocatedEntity.h"
+#include <iostream>
 
 #define ANIMATION_DROP "drop"
 #define ANIMATION_PICKUP "pickup"
@@ -16,7 +17,7 @@ class JobDoer : public LocatedEntity {
         JobDoer() {};
         JobDoer(std::shared_ptr<World> w);
 
-        virtual ~JobDoer() {}
+        virtual ~JobDoer() {std::cout << "A job doer was deleted." << std::endl;}
 
         //!Not virtual anymore, we move the functionality from here to a bunch of other virtual functions for special cases. 
         void update();

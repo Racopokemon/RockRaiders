@@ -34,6 +34,9 @@ class TileJobs {
         void removeJobDeliver(sf::Vector2i w, std::shared_ptr<JobDeliver> j);
         void cancelAllJobDeliverBySystem(sf::Vector2i w);
 
+        //!Do this before you delete the entire world.
+        void cancelAllJobs();
+
     protected : 
         int width;
         int height;

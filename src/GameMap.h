@@ -19,7 +19,7 @@ class GameMap : public Entity {
 
         GameMap(Block ** m, int width, int height, std::string texture);
 
-        ~GameMap();
+        virtual ~GameMap();
 
         std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length, int exitConditionLength = ~0u);
         //!Finds the shortest path to the closest of the targets. 

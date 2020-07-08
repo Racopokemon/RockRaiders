@@ -4,6 +4,7 @@
 #include "Menu.h"
 #include <iostream>
 #include "TextureLoader.h"
+#include "main.h"
 
 class MenuMain : public Menu {
     public : 
@@ -20,11 +21,15 @@ class MenuMain : public Menu {
             addButtonAtTop(b);
 
             addButtonAtBottom(b);
-            addButtonAtBottom(b);
+            addButtonAtBottom(Button(end, "im sooooo scared :(", ICON_X));
         }
         static void doNothing(ButtonContext context) {
             std::cout << "Did ... nothing. (Hey, did you press a button???)" << std::endl;
         }
+        static void end(ButtonContext context) {
+            exitLevel();
+        }
+        
 };
 
 #endif

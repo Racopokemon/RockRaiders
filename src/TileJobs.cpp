@@ -68,3 +68,15 @@ void TileJobs::cancelAllJobDeliverBySystem(sf::Vector2i w) {
     }
     get(w).deliver.clear();
 }
+
+void TileJobs::cancelAllJobs() {
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            sf::Vector2i pos (x, y);
+            if (getJobDrill(pos)) {
+                cancelJobDrillBySystem(pos);
+            }
+            cancelAllJobDeliverBySystem(pos);
+        }
+    }
+}

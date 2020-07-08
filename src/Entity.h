@@ -9,7 +9,7 @@
 //to them (like a this. reference), including routines to request deletion. 
 class Entity {
     public :
-
+        Entity();
         virtual ~Entity() {std::cout << "Entity deleted." << std::endl;}
 
         //!Always call super.update() first!
@@ -26,7 +26,9 @@ class Entity {
         std::shared_ptr<Entity> ref();
     protected :
 
-        virtual void prepareDeletion() {};
+        virtual void prepareDeletion();
+
+        bool getDeleteRequested();
     
     private :
         bool deleteRequested = false; 

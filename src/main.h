@@ -13,4 +13,6 @@ void setMenu();
 
 void resetMenu();
 
+void exitLevel();
+
 #endif

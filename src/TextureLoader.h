@@ -5,6 +5,7 @@
 
 #define TEXTURE_NAME_CRYSTAL "img/crystal.png"
 #define TEXTURE_NAME_ORE "img/ore.png"
+#define TEXTURE_NAME_ICONS "img/icons.png"
 #define MAIN_FONT_NAME "fonts/redline.ttf"
 
 class TextureLoader {

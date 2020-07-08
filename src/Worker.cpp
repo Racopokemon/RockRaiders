@@ -88,7 +88,7 @@ void Worker::onBeginOfTick() {
 }
 
 void Worker::draw(sf::RenderTarget &target, sf::RenderStates states, float delta, float invDelta, bool debug) {
-    float thiccness = 0.14f;
+    float thiccness = 0.12f;
     sf::CircleShape circle(thiccness, 6);
     circle.setFillColor(sf::Color::Transparent);
     circle.setOutlineColor(sf::Color::Black);

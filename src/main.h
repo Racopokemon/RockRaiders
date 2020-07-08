@@ -8,4 +8,9 @@ const std::vector<std::shared_ptr<Entity>> getEntities();
 //!This should even work while rendering (but you don't update here!!) or within an update-stack
 void addEntity(std::shared_ptr<Entity> entity);
 
+template<class T>
+void setMenu();
+
+void resetMenu();
+
 #endif

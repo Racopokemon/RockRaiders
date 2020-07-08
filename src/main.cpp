@@ -1,3 +1,6 @@
+//This is the pretty messy main file. Better take a look at the other, way more structured files ;)
+
+
 #include "main.h"
 
 #include <iostream>
@@ -10,8 +13,9 @@
 #include "GameStatDisplay.h"
 #include "TextureLoader.h"
 #include "Colors.h"
+#include "Menu.h"
+#include "MenuMain.h"
 
-//This is the pretty messy main file. Better take a look at the other, way more structured files ;)
 
 std::vector<std::shared_ptr<Entity>> entities;
 std::shared_ptr<World> world; 
@@ -54,19 +58,19 @@ sf::Vector2i mouseDragStartOnScreen;
 float scrollSinceLastUpdate;
 bool lastFirstDown;
 
+bool menuPressed;
+
 float editorAScrollSinceLastUpdate;
 float editorBScrollSinceLastUpdate;
 
 GameStatDisplay gameStatDisplay;
 
-#define BUTTON_SPACE 100.f
-#define BUTTON_INSET 5.f
-#define BUTTON_SIZE BUTTON_SPACE-2*BUTTON_INSET
-
 //!this is closest possible zoom
 #define ZOOM_MIN 0.0025f
 //!this is the most distanced possible zoom
 #define ZOOM_MAX 0.05f
+
+Menu * menu;
 
 sf::Font * mainFont;
 
@@ -103,8 +107,12 @@ void updateViewport(sf::Vector2f newSize) {
     HUDView = sf::View(sf::FloatRect(0.f, 0.f, newSize.x, newSize.y));
     HUDView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
 
-    menuView = sf::View(sf::FloatRect(BUTTON_SPACE-newSize.x, 0.f, newSize.x, newSize.y));
+    menuView = sf::View(sf::FloatRect(MENU_WIDTH-newSize.x, 0.f, newSize.x, newSize.y));
     menuView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
+
+    if (menu != nullptr) {
+        menu->updateHeight(windowSize.y);
+    }
 }
 
 sf::Vector2f getCamCenterSoThatTheMouseMapsTo(float camZoom, sf::Vector2f mouseCenteredOnWindow, sf::Vector2f mouseOnMap) {
@@ -191,11 +199,12 @@ void printEditor() {
 }
 
 //The bad, not deterministic menu handling is here. Totally dependent on the frames, called before every single render. 
-void tick() {
+void guiTick() {
     if (!gameWindow->hasFocus()) {
         scrollSinceLastUpdate = 0;
         return; 
     }
+
     sf::Vector2i local = sf::Mouse::getPosition(*gameWindow);
     sf::Vector2f mouseCenteredOnWindow = sf::Vector2f(local.x+0.f, local.y+0.f) - windowSize*0.5f;
     sf::Vector2f mouseOnMap = gameWindow->mapPixelToCoords(local, gameView);
@@ -203,22 +212,35 @@ void tick() {
     bool firstDown = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
     //bool secondDown = sf::Mouse::isButtonPressed(sf::Mouse::Button::Right);
     float scroll = scrollSinceLastUpdate;
-    
+    bool mouseAtMenu = local.x >= windowSize.x - MENU_WIDTH;
+
+
+    if (menu != nullptr) {
+        menu->guiTick(gameWindow->mapPixelToCoords(local, menuView), firstDown);
+    }
+
     if (firstDown) {
-        if (!lastFirstDown) {
-            mouseDragStart = mouseOnMap;
-            mouseDragStartOnScreen = local;
-        } else {
-            camCenter = getCamCenterSoThatTheMouseMapsTo(camZoom, mouseCenteredOnWindow, mouseDragStart);
-            updateGameView();
+        if (!menuPressed) {
+            if (!lastFirstDown) {
+                if (mouseAtMenu) {
+                    menuPressed = true;
+                } else {
+                    mouseDragStart = mouseOnMap;
+                    mouseDragStartOnScreen = local;
+                }
+            } else {
+                camCenter = getCamCenterSoThatTheMouseMapsTo(camZoom, mouseCenteredOnWindow, mouseDragStart);
+                updateGameView();
+            }
         }
     } else {
-        if (lastFirstDown) {
+        if (!menuPressed && lastFirstDown) {
             //Released mouse - if we didn't move the mouse, this was a click! 
             if (mouseDragStartOnScreen == local) {
                 onMapClicked(mouseOnMap);
             }
         }
+        menuPressed = false;
     }
  
     if (scrollSinceLastUpdate != 0.0f) {
@@ -274,22 +296,19 @@ void renderHUD() {
 
 //Screen coordinates are scaled so that one button has the size of BUTTON_SPACE, and from origin at top x left
 void renderMenu() {
-    sf::RectangleShape shade(sf::Vector2f(BUTTON_SPACE, windowSize.y));
+    sf::RectangleShape shade(sf::Vector2f(MENU_WIDTH, windowSize.y));
     shade.setFillColor(COLORS_TRANS_BACK);
     target->draw(shade);
-    //Temp of course
-    for (int i = 0; i < 4; i++) {
-        sf::RectangleShape button(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
-        button.setPosition(BUTTON_INSET, BUTTON_INSET + i*BUTTON_SIZE);
-        button.setFillColor(sf::Color::White);
-        target->draw(button);
+
+    if (menu != nullptr) {
+        menu->draw(*target);
     }
 }
 
 //!Delta 0: Previous frame 100% interpolated, 1 current frame 100% interpolated
 void render(float delta) {
     sf::Clock clock;
-    tick();
+    guiTick();
     if (editor) {
         updateEditor();
     }
@@ -324,8 +343,6 @@ void addEntity(std::shared_ptr<Entity> entity) {
 
 int main() {
 
-    std::cout << "pickup jobs arent deleted and neither are pickups themselves!!" << std::endl;
-
     sf::Vector2i newSize(800, 600);
 
     mainFont = TextureLoader::getFont();
@@ -337,9 +354,7 @@ int main() {
     gameWindow = &window;
     target = &window; //If we at some point decide to draw into an image instead ... were prepared! 
 
-    updateViewport(sf::Vector2f((float)newSize.x, (float)newSize.y));
 
-    // The sf::VideoMode class has some interesting static functions to get the desktop resolution, or the list of valid video modes for fullscreen mode. 
     World * w = new World("maps/drillMap.txt");
     world = w->ref();
 
@@ -347,6 +362,9 @@ int main() {
     updateGameView();
 
     gameStatDisplay = GameStatDisplay(world, &windowSize);
+    setMenu<MenuMain>();
+
+    updateViewport(sf::Vector2f((float)newSize.x, (float)newSize.y));
 
     isHalt = true; //Lets don't do any initialization and instead pretend like the game was paused before ... 
     //so all initialization is done by itself in the next update when it is confronted with continuing the loop
@@ -421,7 +439,7 @@ int main() {
             }
         }
         
-        //Tick-Dependent Render (and Update) step
+        //guiTick-Dependent Render (and Update) step
         if (isHalt) {
             if (!shouldHalt) {
                 isHalt = false;
@@ -462,4 +480,19 @@ int main() {
     }
 
     return 0;
+}
+
+void resetMenu() {
+    if (menu != nullptr) {
+        delete menu; //I just hope that ... you inheritance etc actually deletes the data of the whole menu subclass in there. 
+    }
+}
+
+template<class T>
+void setMenu() {
+    resetMenu();
+    float height = windowSize.y;
+    ButtonContext context = ButtonContext(world.get());
+    menu = new T (context);
+    menu->afterCreated(height);
 }

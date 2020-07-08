@@ -28,7 +28,11 @@ set(var_main_sources
 	JobDeliver.h
 	TextureLoader.cpp
 	GameStatDisplay.cpp
-	Colors.h)
+	Colors.h
+	Button.cpp
+	Menu.cpp
+	MenuMain.h
+	IconLookup.h)
 
 find_package(SFML 2.5.1 COMPONENTS audio graphics window system REQUIRED)
 

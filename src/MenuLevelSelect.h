@@ -8,7 +8,7 @@
 class MenuLevelSelect : public Menu {
     public : 
         MenuLevelSelect(ButtonContext context) : Menu(context) {};
-        virtual ~MenuLevelSelect() {std::cout << "MenuLevelSelect deleted" << std::endl;}
+        virtual ~MenuLevelSelect() {}
 
         virtual void init() {
 
@@ -17,7 +17,6 @@ class MenuLevelSelect : public Menu {
             addButtonAtTop(Button(loadLevel3, "Play the third level", ICON_3));
 
             addButtonAtBottom(Button(exitGame, "Exit the game", ICON_X));
-            addButtonAtBottom(Button(buttonExitLevel, "Back to main menu", ICON_BACK));
         }
         
         static void exitGame(ButtonContext context) {
@@ -32,9 +31,6 @@ class MenuLevelSelect : public Menu {
         }
         static void loadLevel3(ButtonContext context) {
             loadLevel("maps/defaultMap.txt");
-        }
-        static void buttonExitLevel(ButtonContext context) {
-            exitLevel();
         }
         
 };

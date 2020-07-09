@@ -74,6 +74,7 @@ GameStatDisplay gameStatDisplay;
 Menu * menu;
 
 sf::Font * mainFont;
+sf::Sprite splash;
 
 void onMapClicked(sf::Vector2f pos) {
     //Here we might first check whether there was an entity that we clicked. 
@@ -114,6 +115,8 @@ void updateViewport(sf::Vector2f newSize) {
     if (menu != nullptr) {
         menu->updateHeight(windowSize.y);
     }
+
+    splash.setPosition(0.5f * newSize);
 }
 
 sf::Vector2f getCamCenterSoThatTheMouseMapsTo(float camZoom, sf::Vector2f mouseCenteredOnWindow, sf::Vector2f mouseOnMap) {
@@ -227,14 +230,17 @@ void guiTick() {
     sf::Vector2f mouseCenteredOnWindow = sf::Vector2f(local.x+0.f, local.y+0.f) - windowSize*0.5f;
     sf::Vector2f mouseOnMap = gameWindow->mapPixelToCoords(local, gameView);
 
-    bool firstDown = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
+    bool firstActuallyDown = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
+    bool firstDown = firstActuallyDown;
     //bool secondDown = sf::Mouse::isButtonPressed(sf::Mouse::Button::Right);
     float scroll = scrollSinceLastUpdate;
     bool mouseAtMenu = local.x >= windowSize.x - MENU_WIDTH;
 
 
+    bool responsive = world.operator bool(); //&& !message
+
     if (menu != nullptr) {
-        menu->guiTick(gameWindow->mapPixelToCoords(local, menuView), firstDown);
+        menu->guiTick(gameWindow->mapPixelToCoords(local, menuView), firstActuallyDown); //We want to click the menu always, the map not. 
     }
 
     if (firstDown) {
@@ -254,7 +260,7 @@ void guiTick() {
     } else {
         if (!menuPressed && lastFirstDown) {
             //Released mouse - if we didn't move the mouse, this was a click! 
-            if (mouseDragStartOnScreen == local) {
+            if (mouseDragStartOnScreen == local && responsive) {
                 onMapClicked(mouseOnMap);
             }
         }
@@ -302,6 +308,8 @@ void drawText(std::string s, sf::Vector2f pos) {
 void renderHUD() {
     if (world) {
         gameStatDisplay.draw(*target);
+    } else {
+        target->draw(splash);
     }
     if (debugMode) {
         drawText("FPS: " + std::to_string(lastFPS), sf::Vector2f(10.f, 20.f));
@@ -361,11 +369,21 @@ void addEntity(std::shared_ptr<Entity> entity) {
     entities.push_back(entity);
 }
 
+void setIcon(sf::Window & w, sf::Texture * t) {
+    sf::Image i = t->copyToImage();
+    w.setIcon(i.getSize().x, i.getSize().y, i.getPixelsPtr());
+}
+
 int main() {
 
-    sf::Vector2i newSize(800, 600);
+    sf::Vector2i newSize(1024, 720);
 
     mainFont = TextureLoader::getFont();
+    sf::Texture * splashTexture = TextureLoader::getTextureByName(TEXTURE_NAME_SPLASH);
+    splashTexture->setSmooth(true);
+    splash.setTexture(*splashTexture);
+    splash.setOrigin(splash.getLocalBounds().width*0.5f, splash.getLocalBounds().height*0.5f);
+    splash.setScale(sf::Vector2f(0.8f, 0.8f));
 
     sf::ContextSettings contextSetting;
     contextSetting.antialiasingLevel = 4;
@@ -373,6 +391,8 @@ int main() {
     window.setKeyRepeatEnabled(false);
     gameWindow = &window;
     target = &window; //If we at some point decide to draw into an image instead ... were prepared! 
+    setIcon(window, TextureLoader::getTextureByName(TEXTURE_NAME_WINDOW_ICON));
+    
 
     updateViewport(sf::Vector2f((float)newSize.x, (float)newSize.y));
 

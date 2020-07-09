@@ -191,7 +191,7 @@ void updateEditor() {
 }
 
 void printEditor() {
-    std::cout << ";	Please keep the empty line above, this ends the level data" << std::endl;
+    //std::cout << ";	Please keep the empty line above, this ends the level data" << std::endl;
     std::cout << ";	Metadata 1 (#Crystals, Rubble amount, Buildung ID, #workers)" << std::endl;
     int i = 0;
     for (int y = 0; y < editorHeight; y++) {
@@ -202,7 +202,7 @@ void printEditor() {
     }
     i = 0;
     std::cout << std::endl;
-    std::cout << ";	Please keep the empty line above, this ends the level data" << std::endl;
+    //std::cout << ";	Please keep the empty line above, this ends the level data" << std::endl;
     std::cout << ";	Metadata 2 (#Ore, visible at start)" << std::endl;
     for (int y = 0; y < editorHeight; y++) {
         for (int x = 0; x < editorWidth; x++) {
@@ -405,8 +405,12 @@ const std::vector<std::shared_ptr<Entity>> getEntities() {
     return entities;
 }
 
-void addEntity(std::shared_ptr<Entity> entity) {
-    entities.push_back(entity);
+void addEntity(std::shared_ptr<Entity> entity, int index) {
+    if (index < 0) {
+        entities.push_back(entity);
+    } else {
+        entities.insert(entities.begin()+index, entity);
+    }
 }
 
 void setIcon(sf::Window & w, sf::Texture * t) {
@@ -427,7 +431,7 @@ int main() {
 
     sf::ContextSettings contextSetting;
     contextSetting.antialiasingLevel = 4;
-    sf::RenderWindow window(sf::VideoMode(newSize.x,newSize.y), "RockRaiders", sf::Style::Default, contextSetting);
+    sf::RenderWindow window(sf::VideoMode(newSize.x,newSize.y), "Miners.", sf::Style::Default, contextSetting);
     window.setKeyRepeatEnabled(false);
     gameWindow = &window;
     target = &window; //If we at some point decide to draw into an image instead ... were prepared! 

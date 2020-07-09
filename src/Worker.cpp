@@ -1,5 +1,6 @@
 #include "Worker.h"
 #include "World.h"
+#include "GameMap.h"
 
 
 Worker::Worker(std::shared_ptr<World> w, sf::Vector2f spawnPos) : JobDoer(w) {
@@ -38,9 +39,9 @@ bool Worker::followPath() {
         }
     }
     float moveSpeed = (float)(world->getMap()->getMovementSpeed(getTile()));
-    moveSpeed = moveSpeed * 0.001f * 0.2f;
+    moveSpeed = moveSpeed * 0.001f * 0.26f;
     if (pickup) {
-        moveSpeed *= 0.7f;
+        moveSpeed *= 0.77f;
     }
     if ((int)path.size() <= walkingTileIndex) {
         //Fine-tune the position on the destination tile

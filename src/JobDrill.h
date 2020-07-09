@@ -6,6 +6,8 @@
 #include "World.h"
 #include "TileJobs.h"
 #include "Worker.h"
+#include "GameMap.h"
+
 
 class JobDrill : public Job {
     public : 

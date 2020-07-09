@@ -6,6 +6,7 @@
 #include "Graph.h"
 #include <SFML/Graphics.hpp>
 #include "BlockPropertiesLookup.h"
+#include "World.h"
 
 //! Manages the entire map, including the rendering, but also responsible for logic, modification, etc. 
 class GameMap : public Entity {
@@ -17,8 +18,9 @@ class GameMap : public Entity {
         int getWidth();
         int getHeight();
 
-        GameMap(Block ** m, int width, int height, std::string textureName);
+        GameMap(Block ** m, int width, int height, std::string textureName, std::shared_ptr<World> world);
 
+        virtual void prepareDeletion();
         virtual ~GameMap();
 
         std::vector<sf::Vector2i> findPathBetween(sf::Vector2i start, sf::Vector2i target, int & length, int exitConditionLength = ~0u);
@@ -62,8 +64,6 @@ class GameMap : public Entity {
         bool isAbsorbingPickups(sf::Vector2i pos);
 
         bool isHoldingPickups(sf::Vector2i pos);
-
-        int getWorkersAtStart(sf::Vector2i pos);
 
         BuildingType getBuildingType(sf::Vector2i pos);
 
@@ -115,6 +115,7 @@ class GameMap : public Entity {
 
     private : 
         Block & getBlock(sf::Vector2i pos);
+        std::shared_ptr<World> world;
         bool inBounds(int x, int y);
         bool isPositionWalkable(int x, int y);
         void connectIfFree(Graph & g, sf::Vector2i start, sf::Vector2i* pos, int listSize, bool onlyAverageFirstAndLast);

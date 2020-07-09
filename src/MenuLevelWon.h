@@ -12,7 +12,7 @@ class MenuLevelWon : public Menu {
 
         virtual void init() {
 
-            addButtonAtTop(Button(continuePlaying, "Continue playing this level", ICON_TICK));
+            addButtonAtTop(Button(continuePlaying, "Continue playing this level", ICON_START));
 
             addButtonAtTop(Button(backToMainMenu, "Back to main menu", ICON_LEAVE));
         }

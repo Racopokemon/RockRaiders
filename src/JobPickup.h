@@ -4,6 +4,7 @@
 #include "Shortcuts.h"
 #include "Job.h"
 #include "Pickup.h"
+#include "GameMap.h"
 #include <iostream>
 
 class JobPickup : public Job {

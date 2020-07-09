@@ -13,9 +13,9 @@ class Job;
 #include "Pickup.h"
 #include "Job.h"
 #include "JobDoer.h"
-#include "GameMap.h"
 #include "MapData.h"
 class TileJobs;
+class GameMap;
 #include <list>
 
 /**
@@ -26,6 +26,10 @@ class World {
 
         World(std::string mapName);
         virtual ~World();
+
+        void tileWithWorkersUncovered(sf::Vector2i pos, int number);
+
+        void spawnWorkerAt(sf::Vector2f pos);
 
         //! The mastermind of job scheduling. 
         //Here we assign a job to the JobDoer, that he is able to perform (also reachable etc.)
@@ -81,6 +85,8 @@ class World {
         //Therefore, we should cancel all our selections (which might also change the menu, but thats fine because this is called before)
         //to match the state after the message was exited. 
         void onMessageShown();
+
+        
 
     protected : 
 

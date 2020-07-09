@@ -18,12 +18,12 @@
 World::World(std::string mapName) {
     reference = std::shared_ptr<World>(this);
     try {
-        map = loadFromFile(mapName, data);
+        map = loadFromFile(mapName, data, ref());
     } catch (std::exception& e) {
         std::cout << "Loading the file failed. ";
         std::cout << e.what();
     }
-    addEntity(map);
+    addEntity(map, 0); //The map already spawns workers, and adding the world on top would render the world over them. 
     tileJobs = std::make_unique<TileJobs>(map->getWidth(), map->getHeight());
     srand(1337);
 
@@ -31,15 +31,7 @@ World::World(std::string mapName) {
         for (int x = 0; x < map->getWidth(); x++) {
             sf::Vector2i pos(x, y);
             BlockType t = map->getBlockType(pos);
-            if (t == GROUND || t == PLATE) {
-                int w = map->getWorkersAtStart(pos);
-                for (int i = 0; i < w; i++) {
-                    Worker * w = new Worker(ref(), map->getRandomPositionInTile(pos, 0.05f));
-                    addEntity(w->ref());
-                    workers++; 
-                    //TODO: Once this happens on other places as well, this should be an additional function. 
-                }
-            } else if (t == BUILDING) {
+            if (t == BUILDING) {
                 if (map->isStorageBuilding(pos)) {
                     storageLocations.push_back(LocatedEntity::getTileCenter(pos) + sf::Vector2f(-0.3f, 0.3f));
                     storageTiles.push_back(pos);
@@ -52,6 +44,18 @@ World::World(std::string mapName) {
 
 World::~World() {
     std::cout << "DANG the world got deleted D::::: mommy pick me um im SCARED" << std::endl;
+}
+
+void World::tileWithWorkersUncovered(sf::Vector2i pos, int number) {
+    for (int i = 0; i < number; i++) {
+        spawnWorkerAt(map->getRandomPositionInTile(pos, 0.05f));
+    }
+}
+
+void World::spawnWorkerAt(sf::Vector2f pos) {
+    Worker * w = new Worker(ref(), pos);
+    addEntity(w->ref());
+    workers++; 
 }
 
 void World::requestJob(std::shared_ptr<JobDoer> j) {

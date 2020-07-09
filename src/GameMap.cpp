@@ -7,7 +7,8 @@
 void GameMap::update() {}
 
 
-GameMap::GameMap(Block ** m, int width, int height, std::string textureName) {
+GameMap::GameMap(Block ** m, int width, int height, std::string textureName, std::shared_ptr<World> world) {
+    this->world = world;
     this->width = width; 
     this->height = height; 
 
@@ -67,6 +68,10 @@ GameMap::~GameMap() {
         delete[height] map[i];
     }
     delete[width] map; 
+}
+void GameMap::prepareDeletion() {
+    Entity::prepareDeletion();
+    world.reset();
 }
 
 bool GameMap::inMapBounds(sf::Vector2i pos) {
@@ -351,10 +356,6 @@ bool GameMap::isVisible(sf::Vector2i pos) {
     return getBlock(pos).isVisible();
 }
 
-int GameMap::getWorkersAtStart(sf::Vector2i pos) {
-    return getBlock(pos).getWorkersAtStart();
-}
-
 void GameMap::setVisible(sf::Vector2i pos, bool recursionStart) {
     if (!inMapBounds(pos)) {
         return;
@@ -368,8 +369,13 @@ void GameMap::setVisible(sf::Vector2i pos, bool recursionStart) {
             setVisible(pos + sf::Vector2i(1, 0), false);
             setVisible(pos + sf::Vector2i(-1, 0), false);
         }
+        if (b.getBlockType() == GROUND) {
+            int workers = b.getWorkersAtStart();
+            if (workers > 0) {
+                world->tileWithWorkersUncovered(pos, workers);
+            }
+        }
     }
-    
 }
 
 void GameMap::recalculateConnectedness() {

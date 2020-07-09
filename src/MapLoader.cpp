@@ -71,7 +71,7 @@ std::string combineStrings(std::vector<std::string> lines) {
     return s;
 }
 
-std::shared_ptr<GameMap> loadFromFile(std::string file, MapData & mapDataReturn) {
+std::shared_ptr<GameMap> loadFromFile(std::string file, MapData & mapDataReturn, std::shared_ptr<World> world) {
 
 
     std::ifstream fin;
@@ -111,7 +111,7 @@ std::shared_ptr<GameMap> loadFromFile(std::string file, MapData & mapDataReturn)
     fillInMeta(readChunk(fin), map, width, height, true);
     fillInMeta(readChunk(fin), map, width, height, false);
 
-    GameMap * gameMap = new GameMap(map, width, height, mapDataReturn.textureName);
+    GameMap * gameMap = new GameMap(map, width, height, mapDataReturn.textureName, world);
 
     return std::dynamic_pointer_cast<GameMap>(gameMap->ref());
 }

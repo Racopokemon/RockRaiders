@@ -6,7 +6,7 @@
 const std::vector<std::shared_ptr<Entity>> getEntities();
 
 //!This should even work while rendering (but you don't update here!!) or within an update-stack
-void addEntity(std::shared_ptr<Entity> entity);
+void addEntity(std::shared_ptr<Entity> entity, int index = -1);
 
 //!This instantly removes the old menu. Expected to be called from a menu button. 
 template<class T>

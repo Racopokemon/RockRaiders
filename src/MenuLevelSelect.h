@@ -12,9 +12,9 @@ class MenuLevelSelect : public Menu {
 
         virtual void init() {
 
-            addButtonAtTop(Button(loadLevel1, "Play the first level", ICON_1));
+            addButtonAtTop(Button(loadLevel1, "Play the introduction level", ICON_1));
             addButtonAtTop(Button(loadLevel2, "Play the second level", ICON_2));
-            addButtonAtTop(Button(loadLevel3, "Play the third level", ICON_3));
+            addButtonAtTop(Button(loadLevel3, "Play the (epic) final level", ICON_3));
 
             addButtonAtBottom(Button(exitGame, "Exit the game", ICON_X));
         }
@@ -27,10 +27,10 @@ class MenuLevelSelect : public Menu {
             loadLevel("maps/level1.txt");
         }
         static void loadLevel2(ButtonContext context) {
-            loadLevel("maps/drillMap.txt");
+            loadLevel("maps/level2.txt");
         }
         static void loadLevel3(ButtonContext context) {
-            loadLevel("maps/defaultMap.txt");
+            loadLevel("maps/level3.txt");
         }
         
 };

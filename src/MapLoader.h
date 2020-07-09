@@ -9,7 +9,8 @@
 
 #include "GameMap.h"
 #include "MapData.h"
+#include "World.h"
 
-std::shared_ptr<GameMap> loadFromFile(std::string file, MapData & mapDataReturn); 
+std::shared_ptr<GameMap> loadFromFile(std::string file, MapData & mapDataReturn, std::shared_ptr<World> world); 
 
 #endif

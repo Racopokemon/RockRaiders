@@ -352,7 +352,7 @@ void renderCenteredHUD() {
         sf::Text text;
         text.setString(messageText);
         text.setFillColor(COLORS_MESSAGE_TEXT);
-        text.setCharacterSize(18.f);
+        text.setCharacterSize(20.f);
         text.setFont(*mainFont);
         text.setOrigin((int)(text.getLocalBounds().width * 0.5f), (int)(text.getLocalBounds().height * 0.5f));
         target->draw(text);

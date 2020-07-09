@@ -14,6 +14,7 @@ class Job;
 #include "Job.h"
 #include "JobDoer.h"
 #include "GameMap.h"
+#include "MapData.h"
 class TileJobs;
 #include <list>
 
@@ -99,6 +100,7 @@ class World {
         int crystals = 0;
         int ores = 0;
 
+        MapData data;
         //!If the win conditions are fulfilled, we get everything ready to show the message and store that this level is won. 
         void checkWin();
         bool won = false;

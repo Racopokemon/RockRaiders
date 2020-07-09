@@ -7,12 +7,12 @@
 void GameMap::update() {}
 
 
-GameMap::GameMap(Block ** m, int width, int height, std::string texture) {
+GameMap::GameMap(Block ** m, int width, int height, std::string textureName) {
     this->width = width; 
     this->height = height; 
-    
+
     map = m; 
-    this->texture = TextureLoader().getTextureByName(texture);
+    this->texture = TextureLoader().getTextureByName(textureName);
     //this->texture.setSmooth(true); 
     singleTextureSize = this->texture->getSize().x / TEXTURE_TILES_PER_ROW; 
     renderDataTextures = sf::VertexArray(sf::Quads, width*height*4); 

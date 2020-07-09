@@ -35,7 +35,8 @@ set(var_main_sources
 	IconLookup.cpp
 	MenuLevelSelect.h
 	MenuLevelStart.h
-	MenuLevelWon.h)
+	MenuLevelWon.h
+	MapData.h)
 
 find_package(SFML 2.5.1 COMPONENTS audio graphics window system REQUIRED)
 

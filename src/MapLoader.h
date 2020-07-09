@@ -8,7 +8,8 @@
 #define MAPLOADER_H
 
 #include "GameMap.h"
+#include "MapData.h"
 
-std::shared_ptr<GameMap> loadFromFile(std::string file); 
+std::shared_ptr<GameMap> loadFromFile(std::string file, MapData & mapDataReturn); 
 
 #endif

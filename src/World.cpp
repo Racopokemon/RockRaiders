@@ -18,11 +18,10 @@
 World::World(std::string mapName) {
     reference = std::shared_ptr<World>(this);
     try {
-        map = loadFromFile(mapName);
+        map = loadFromFile(mapName, data);
     } catch (std::exception& e) {
         std::cout << "Loading the file failed. ";
         std::cout << e.what();
-        exit(-1);
     }
     addEntity(map);
     tileJobs = std::make_unique<TileJobs>(map->getWidth(), map->getHeight());
@@ -182,18 +181,40 @@ void World::getGameStatPointers(int ** crystals, int ** ores, int ** workers) {
 void World::update() {
     if (showWinMessage) {
         showWinMessage = false;
-        setMessage<MenuLevelWon>("yeee victoree");
+        setMessage<MenuLevelWon>(data.winText);
     } else if (showStartMessage) {
         showStartMessage = false; 
         //Its better to schedule this and wait until one update and some frames have been seen until we show the message - 
         //it might eg happen that main.cpp was still initializing the game speed after etc. 
-        setMessage<MenuLevelStart>("This is a test my chickens \nDo we support several lines?");
+        setMessage<MenuLevelStart>(data.startText);
     }
 }
 
  void World::checkWin() {
     if (!won) {
-        if (false) { //conditions
+        int numberWinConditions = 0;
+        int numberFulfilledConditions = 0;
+        if (data.crystalsToWin > 0) {
+            numberWinConditions++;
+            if (crystals = data.crystalsToWin) {
+                numberFulfilledConditions++;
+            }
+        }
+        if (data.oresToWin > 0) {
+            numberWinConditions++;
+            if (ores = data.oresToWin) {
+                numberFulfilledConditions++;
+            }
+        }
+        //artifacts are not (yet) implemented, but should be easy and stuff ...
+        if (data.basesToWin > 0) {
+            numberWinConditions++;
+            if (storageLocations.size() >= data.basesToWin) { 
+                //Strictly taken, this will become wrong in the future, when there are several bases etc and not all are storageLocations etc. 
+                numberFulfilledConditions++;
+            }
+        }
+        if (numberWinConditions == numberFulfilledConditions) {
             won = true;
             showWinMessage = true;
         }

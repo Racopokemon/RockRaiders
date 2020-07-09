@@ -17,7 +17,7 @@ class GameMap : public Entity {
         int getWidth();
         int getHeight();
 
-        GameMap(Block ** m, int width, int height, std::string texture);
+        GameMap(Block ** m, int width, int height, std::string textureName);
 
         virtual ~GameMap();
 

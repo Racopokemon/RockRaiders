@@ -9,11 +9,11 @@ int getTextureNumber(Block b) {
     case HARD:
         return 1;
     case NORMAL_A:
-        return 2;
+        return 4;
     case NORMAL_B:
         return 3;
     case NORMAL_C:
-        return 4;
+        return 2;
     case RUBBLE:
         return 8+b.getRubbleAmount();
     case GROUND:

@@ -51,7 +51,9 @@ void GameMap::draw (sf::RenderTarget &target, float delta, bool debug) {
                 }
             }
         }
-        target.draw(&vlist[0], vlist.size(), sf::Lines);
+        if (!vlist.empty()) {
+            target.draw(&vlist[0], vlist.size(), sf::Lines);
+        }
     }
 }
 int GameMap::getHeight() { 

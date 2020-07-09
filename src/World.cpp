@@ -196,13 +196,13 @@ void World::update() {
         int numberFulfilledConditions = 0;
         if (data.crystalsToWin > 0) {
             numberWinConditions++;
-            if (crystals = data.crystalsToWin) {
+            if (crystals >= data.crystalsToWin) {
                 numberFulfilledConditions++;
             }
         }
         if (data.oresToWin > 0) {
             numberWinConditions++;
-            if (ores = data.oresToWin) {
+            if (ores >= data.oresToWin) {
                 numberFulfilledConditions++;
             }
         }

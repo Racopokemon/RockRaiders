@@ -241,6 +241,9 @@ void guiTick() {
 
 
     bool responsive = world.operator bool() && !message;
+    if (!responsive) {
+        firstDown = false; 
+    }
 
     if (menu != nullptr) {
         menu->guiTick(gameWindow->mapPixelToCoords(local, menuView), firstActuallyDown); //We want to click the menu always, the map not. 
@@ -270,7 +273,7 @@ void guiTick() {
         dragCurrentlyDisabled = false;
     }
  
-    if (scrollSinceLastUpdate != 0.0f) {
+    if (scrollSinceLastUpdate != 0.0f && responsive) {
         camZoom *= powf(0.8f, scrollSinceLastUpdate);
         capZoom();
         camCenter = getCamCenterSoThatTheMouseMapsTo(camZoom, mouseCenteredOnWindow, mouseOnMap);

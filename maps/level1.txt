@@ -14,7 +14,8 @@
 ;	O OreF			
 ;	Y CrystalF		
 ;	- Lava			
-;	~ Water			
+;	~ Water		
+;	@ Artifact	
 ;
 ;   Keep all empty lines, this is what the loader uses as divider. 
 ;	(and line lengths over 1024 make us crash, try to avoid that)
@@ -37,35 +38,29 @@ img/map.png
 ;	The level introduction text: 
 - A ... WHAT? 
 - A river, sir. 
-- You wanna tell me, that there came ... a GODDAMN RIVER out of NOWHERE? 
-- Not out of nowhere, we measured the water before, and when we then started to drill the walls ...
-- Couldn't you GUESS that this would happen with such instable walls? 
-- Erm, no, we don't know those caves, that's why were here actually. 
-- aaand for drilling ...
-- sssh shut up, Peter!
-- Anyway, where is the problem alltogether? Let's simply spawn a new base and ...
-- GODDAMIT, NO, you MORONS! What do you think are our ressources for this project? Do you think they are unlimited or something? 
-- Ressources? Can't we get anything we want from HQ anyway?
-- ... not, if it's not implemented yet, to be exact ...
-- PETER, keep that goddam forth wall intact *at least* for the first level!
-- Intact like all the walls I'm not supposed to drill? Bruh what do you think is my JOB here? 
-- Guys keep it keep it its no issue anyway ...
-- Ah?
-- See, how about we just drill *around* this puddle and connect us back to the base from the other side? 
-- You mean, a big ark around that stream? 
-- THANK YOU Mister Morne! This is EXACTLY what I expect you to do now, and you better do it QUICK, before I come down and take the drill myself! 
-- pff yeah I wanna see *that* happen ..
-- Peter!!
-- AND THEN return back to your ACTUAL TASK! Do you remember? 
-- drilling walls? ...
-- COLLECTING RESSOURCES, MISTER PETER!! Are you DUMB or something?
-- actually, since I realized this is only a fricking -
-- 5 CRYSTALS, do you copy? 5 Crystals! There is NO returning back before you haven't gathered all of them! Understood??
-- yessir. Goddamit, here we go again ..
+- You wanna tell me that there came ... a GODDAMN 
+  RIVER out of NOWHERE? 
+- Not out of nowhere, we measured the water before, 
+  and when we then started to drill the walls ...
+- Argh GODDAMIT. Then you maybe better drill 
+  somewhere ELSE. ... However, you still see the 
+  base on the other side of the river, don't you?
+- yeah, I actually WAS there two minutes ago -
+- SILENCE, Peter. Our scans indicate that there 
+  might be a way around the river and back to the 
+  base. So I suggest you just drill your way back 
+  there - I mean you've just proven that you're at 
+  least good at THAT -
+- .. literally no idea what you're talking about ..
+- AND THEEN you collect five crystals. Sounds 
+  like a plan?
+- yessir. ... Jesus, here we go again ..
 
 ;	The level completion text:
-Well done, you managed to collect 5 crystals! 
-With that, our job is fulfilled here. 
+Hey nice, we *actually* found a way back to the base - 
+and picked up all five crystals up there! 
+  
+Good work, this mine is clear now! 
 
 ;
 ;	Main Map:
@@ -137,5 +132,32 @@ With that, our job is fulfilled here.
 
 
 
+Just for fun, this is the not shortened text: 
 
-
+- A ... WHAT? 
+- A river, sir. 
+- You wanna tell me that there came ... a GODDAMN RIVER out of NOWHERE? 
+- Not out of nowhere, we measured the water before, and when we then started to drill the walls ...
+- Couldn't you GUESS that this would happen with such instable walls? 
+- Erm, no, we don't know those caves, that's why were here actually. 
+- aaand for drilling ...
+- sssh shut up, Peter!
+- Anyway, where is the problem alltogether? Let's simply spawn a new base and ...
+- GODDAMIT, NO, you MORONS! What do you think are our ressources for this project? Do you think they are unlimited or something? 
+- Ressources? Can't we get anything we want from HQ anyway?
+- ... not, if it's not implemented yet, to be exact ...
+- PETER, keep that goddam forth wall intact *at least* for the first level!
+- Intact like all the walls I'm not supposed to drill? Bruh what do you think is my JOB here? 
+- Guys keep it keep it its no issue anyway ...
+- Ah?
+- See, how about we just drill *around* this puddle and connect us back to the base from the other side? 
+- You mean, a big ark around that stream? 
+- THANK YOU Mister Morne! This is EXACTLY what I expect you to do now, and you better do it QUICK, before I come down and take the drill myself! 
+- pff yeah I wanna see *that* happen ..
+- Peter!!
+- AND THEN return back to your ACTUAL TASK! Do you remember? 
+- drilling walls? ...
+- COLLECTING RESSOURCES, MISTER PETER!! Are you DUMB or something?
+- actually, since I realized this is only a fricking -
+- 5 CRYSTALS, do you copy? 5 Crystals! There is NO returning back before you haven't gathered all of them! Understood??
+- yessir. Goddamit, here we go again ..

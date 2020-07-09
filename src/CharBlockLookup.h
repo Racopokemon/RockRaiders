@@ -34,6 +34,8 @@ Block getBlockFromCharacter(char block) {
         return WATER;
     case '-':
         return LAVA;
+    case '@':
+        return ARTIFACT;
     default:
         std::cout << "WARNING: Char " << block << "does not map to a valid block, replaced with ground\n";
         return GROUND;

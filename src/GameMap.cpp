@@ -374,6 +374,8 @@ void GameMap::setVisible(sf::Vector2i pos, bool recursionStart) {
             if (workers > 0) {
                 world->tileWithWorkersUncovered(pos, workers);
             }
+        } else if (b.getBlockType() == ARTIFACT) {
+            world->artifactDiscovered();
         }
     }
 }

@@ -51,6 +51,9 @@ class World {
         //Remove the Pickup (Absorbed by some storage)
         void pickupDropped(std::shared_ptr<Pickup> p);
 
+        //!Called by the gameMap during visibility updates.
+        void artifactDiscovered();
+
         //!We still receive the float position, because this allows us e.g. to specify the exact position for workers to navigate to
         void onTileClicked(sf::Vector2f pos);
 
@@ -105,6 +108,7 @@ class World {
         int workers = 0;
         int crystals = 0;
         int ores = 0;
+        int artifacts = 0;
 
         MapData data;
         //!If the win conditions are fulfilled, we get everything ready to show the message and store that this level is won. 

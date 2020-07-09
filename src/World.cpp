@@ -168,6 +168,11 @@ void World::pickupDropped(std::shared_ptr<Pickup> p, bool droppedNew) {
     }
 }
 
+void World::artifactDiscovered() {
+    artifacts++;
+    checkWin();
+}
+
 GameMap * World::getMap() {
     return map.get();
 }
@@ -210,7 +215,12 @@ void World::checkWin() {
                 numberFulfilledConditions++;
             }
         }
-        //artifacts are not (yet) implemented, but should be easy and stuff ...
+        if (data.artifactsToWin > 0) {
+            numberWinConditions++;
+            if (artifacts >= data.artifactsToWin) {
+                numberFulfilledConditions++;
+            }
+        }
         if (data.basesToWin > 0) {
             numberWinConditions++;
             if (storageLocations.size() >= data.basesToWin) { 

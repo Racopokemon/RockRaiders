@@ -190,7 +190,7 @@ void World::update() {
     }
 }
 
- void World::checkWin() {
+void World::checkWin() {
     if (!won) {
         int numberWinConditions = 0;
         int numberFulfilledConditions = 0;

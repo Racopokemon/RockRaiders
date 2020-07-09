@@ -4,8 +4,18 @@
 #include "JobDoer.h"
 #include <SFML/Graphics.hpp>
 #include "World.h"
+#include "TextureLoader.h"
 
 #define ANIMATION_DRILL "drill"
+
+#define WORKER_TILES_COUNT 5
+#define WORKER_TILE_IDLE 0
+#define WORKER_TILE_CARRY 1
+#define WORKER_TILE_DRILL 2
+#define WORKER_TILE_TOOL 3
+#define WORKER_TILE_CARRY_DRILL 4
+
+#define WORKER_TILE_CENTER_FACTOR 1.46f
 
 class Worker : public JobDoer {
     public : 
@@ -32,6 +42,11 @@ class Worker : public JobDoer {
         int animationLength;
 
         bool animationPlaying = false; 
+        bool drilling = false;
+        bool drillPlaying = false;
+
+        sf::Texture * texture = nullptr;
+
 };
 
 #endif

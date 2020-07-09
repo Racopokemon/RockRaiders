@@ -8,6 +8,7 @@
 #define TEXTURE_NAME_WINDOW_ICON "img/window.png"
 #define TEXTURE_NAME_ICONS "img/icons.png"
 #define TEXTURE_NAME_SPLASH "img/splash.png"
+#define TEXTURE_NAME_WORKER "img/worker.png"
 #define MAIN_FONT_NAME "fonts/redline.ttf"
 
 class TextureLoader {

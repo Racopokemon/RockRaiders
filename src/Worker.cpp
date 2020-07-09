@@ -1,8 +1,12 @@
 #include "Worker.h"
 #include "World.h"
 
+
 Worker::Worker(std::shared_ptr<World> w, sf::Vector2f spawnPos) : JobDoer(w) {
     setPosition(spawnPos);
+    texture = TextureLoader::getTextureByName(TEXTURE_NAME_WORKER);
+    texture->setSmooth(true);
+    setRotation(rand()%360);
 };
 
 void Worker::initPath() {
@@ -56,19 +60,26 @@ bool Worker::readyForNextTileInPath() {
 void Worker::initAnimation() {
     animationFrame = 0;
     if (animationName == ANIMATION_DRILL) {
+        drilling = true;
         animationLength = *((int *)animationData);
         delete (int *)animationData;
     } else {
         animationLength = 10; //For now all other animations last simply 10 frames. 
+        drilling = false; 
     }
     
 }
 bool Worker::updateAnimation() {
     bool finishedAfterThisUpdate = ++animationFrame >= animationLength;
     animationPlaying = true; //This is not done in initAnimation, because we might already know that at the end of a tick the animation will begin the tick after
+    drillPlaying = drilling; 
 
     if (isJobCancelled() && animationName == ANIMATION_DRILL) {
         finishedAfterThisUpdate = true; 
+    }
+
+    if (finishedAfterThisUpdate) {
+        drilling = false;
     }
     return finishedAfterThisUpdate;
 }
@@ -85,16 +96,34 @@ void Worker::idleAnimation() {};
 
 void Worker::onBeginOfTick() {
     animationPlaying = false;
+    drillPlaying = false;
 }
 
 void Worker::draw(sf::RenderTarget &target, sf::RenderStates states, float delta, float invDelta, bool debug) {
-    float thiccness = 0.12f;
-    sf::CircleShape circle(thiccness, 6);
-    circle.setFillColor(sf::Color::Transparent);
-    circle.setOutlineColor(sf::Color::Black);
-    circle.setOutlineThickness(0.03f);
-    circle.setPosition(-thiccness, -thiccness);
-    target.draw(circle, states);
+
+    float workerScale = 0.31f;
+
+    int tileIndex = WORKER_TILE_IDLE;
+    if (drilling) {
+        tileIndex = WORKER_TILE_DRILL;
+    } else if (pickup) {
+        tileIndex = WORKER_TILE_CARRY;
+    }
+    sf::Vector2u size = texture->getSize();
+    int tileHeight = size.y/WORKER_TILES_COUNT;
+    sf::IntRect tile = sf::IntRect(0, tileHeight*tileIndex, size.x, tileHeight);
+
+    float mid = tileHeight * 0.5f;
+    float scale = 1.f/tileHeight * workerScale;
+
+    sf::Sprite s(*texture, tile);
+    s.setOrigin(mid * WORKER_TILE_CENTER_FACTOR, mid);
+    s.setScale(scale, scale);
+    s.rotate(-90.f);
+
+    target.draw(s, states);
+
+
 
     if (animationPlaying) {
         float barWidth = 0.8f, barHeight = 0.1f;
@@ -102,7 +131,7 @@ void Worker::draw(sf::RenderTarget &target, sf::RenderStates states, float delta
         float interpolation = (animationFrame+delta)/animationLength;
         interpolation*=barWidth;
 
-        sf::Vector2f pos = sf::Vector2f(barWidth*-0.5f, thiccness + 0.1f);
+        sf::Vector2f pos = sf::Vector2f(barWidth*-0.5f, workerScale*0.5f + 0.1f);
         pos += getPosition();
 
         sf::RectangleShape barProgress(sf::Vector2f(interpolation, barHeight));

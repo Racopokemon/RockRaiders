@@ -17,6 +17,7 @@
 ;	~ Water			
 ;
 ;   Keep all empty lines, this is what the loader uses as divider. 
+;	(and line lengths over 1024 make us crash, try to avoid that)
 ;
 ;	TextureSet: 
 img/map.png
@@ -67,8 +68,8 @@ Well done, you managed to collect 5 crystals!
 With that, our job is fulfilled here. 
 
 ;
-;
 ;	Main Map:
+;	
 ###################################
 ####---- ###########~~~~~~~########
 #####--   ########~~~#~~~~~~~######

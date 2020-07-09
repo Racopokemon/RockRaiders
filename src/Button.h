@@ -5,7 +5,8 @@
 #include "World.h"
 
 #define BUTTON_SIZE 80.f
-#define BUTTON_TEXT_DISTANCE 15.f
+#define BUTTON_TEXT_DISTANCE 20.f
+#define BUTTON_TEXT_SHADE_SPACE 6.f
 
 enum ButtonState {
     NORMAL, HOVER, PRESSED, PRESSED_BUT_LEFT

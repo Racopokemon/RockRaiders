@@ -53,10 +53,17 @@ void Button::draw(sf::RenderTarget & target, sf::Time time, ButtonState state) {
         text.setString(description);
         text.setFillColor(COLORS_BUTTON_TEXT);
         text.setFont(*font);
-        text.setCharacterSize(14);
+        text.setCharacterSize(16);
         sf::FloatRect b = text.getLocalBounds();
-        text.setOrigin(b.left + b.width - b.height * 0.5f, b.top + b.height * 0.5f);
+        text.setOrigin((int)(b.left + b.width - b.height * 0.5f), (int)(b.top + b.height * 0.5f));
         text.setPosition(rect.left - BUTTON_TEXT_DISTANCE, rect.top + rect.height * 0.5f);
+        
+        b = text.getGlobalBounds();
+        sf::RectangleShape shade(sf::Vector2f(b.width + 2*BUTTON_TEXT_SHADE_SPACE, b.height + 2*BUTTON_TEXT_SHADE_SPACE));
+        shade.setPosition(sf::Vector2f(b.left, b.top) - sf::Vector2f(BUTTON_TEXT_SHADE_SPACE, BUTTON_TEXT_SHADE_SPACE));
+        shade.setFillColor(COLORS_BUTTON_SHADE);
+
+        target.draw(shade);
         target.draw(text);
     }
 

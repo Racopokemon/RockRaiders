@@ -17,8 +17,6 @@ class Job;
 class TileJobs;
 #include <list>
 
-
-
 /**
  * By now, the World turns more and more into the Job coordinator, knowing all Jobs and the map and doing stuff for them
  */
@@ -71,6 +69,18 @@ class World {
 
         void getGameStatPointers(int ** crystals, int ** ores, int ** workers);
 
+        //!Called after all entities were updated. Really doesn't do much, plays no role in deleting, 
+        //but on showing messages, which should happen after all updates and not in between (menus might still change mid-entity-list)
+        //
+        //General approach: Show and exit menus at anytime, even mid-update, they are handled instantly and nobody cares
+        //but set messages only before or after the update-cascade
+        void update();
+
+        //!This is relevant because the menu changes due to this, and upon return, it is replaced with the default menu. 
+        //Therefore, we should cancel all our selections (which might also change the menu, but thats fine because this is called before)
+        //to match the state after the message was exited. 
+        void onMessageShown();
+
     protected : 
 
         void pickupDropped(std::shared_ptr<Pickup> p, bool droppedNew);
@@ -88,6 +98,12 @@ class World {
         int workers = 0;
         int crystals = 0;
         int ores = 0;
+
+        //!If the win conditions are fulfilled, we get everything ready to show the message and store that this level is won. 
+        void checkWin();
+        bool won = false;
+        bool showWinMessage = false; 
+        bool showStartMessage = true; 
 };
 
 #endif

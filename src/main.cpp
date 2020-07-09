@@ -3,7 +3,7 @@
 #include "main.h"
 
 #include <iostream>
-#include "SFML/Graphics.hpp"
+#include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include "TestEntity.h"
 #include "World.h"
@@ -22,7 +22,7 @@ std::shared_ptr<World> world;
 
 bool isHalt, shouldHalt;
 sf::Time currentFrameLength, nextFrameLength, timePassedSinceFrameStart;
-int tps; //Is never used (except for displaying), gets just new values set
+int tps; //Mainly used for displaying, but should be consistend since we use it to restore the initial tps after a message
 sf::Time zeroTime = sf::seconds(0);
 sf::Time oneSecondTime = sf::seconds(1);
 
@@ -41,6 +41,7 @@ int editorWidth, editorHeight;
 sf::View gameView; 
 sf::View HUDView;  
 sf::View menuView; 
+sf::View centeredView; 
 
 sf::Vector2f windowSize(1.f,1.f);
 
@@ -58,7 +59,7 @@ sf::Vector2i mouseDragStartOnScreen;
 float scrollSinceLastUpdate;
 bool lastFirstDown;
 
-bool menuPressed;
+bool dragCurrentlyDisabled;
 
 float editorAScrollSinceLastUpdate;
 float editorBScrollSinceLastUpdate;
@@ -72,6 +73,12 @@ GameStatDisplay gameStatDisplay;
 #define ZOOM_DEFAULT 0.007f;
 
 Menu * menu;
+bool message = false;
+std::string messageText;
+int tpsBeforeMessage;
+#define MESSAGE_SIZE sf::Vector2f(600, 400)
+#define MESSAGE_TITLE_SIZE sf::Vector2f(600, 50)
+#define MESSAGE_TITLE_POS sf::Vector2f(0, (MESSAGE_SIZE.y + MESSAGE_TITLE_SIZE.y) * -0.5f - 10.f)
 
 sf::Font * mainFont;
 sf::Sprite splash;
@@ -112,11 +119,12 @@ void updateViewport(sf::Vector2f newSize) {
     menuView = sf::View(sf::FloatRect(MENU_WIDTH-newSize.x, 0.f, newSize.x, newSize.y));
     menuView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
 
+    centeredView = sf::View(sf::Vector2f(0,0), newSize);
+    centeredView.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
+
     if (menu != nullptr) {
         menu->updateHeight(windowSize.y);
     }
-
-    splash.setPosition(0.5f * newSize);
 }
 
 sf::Vector2f getCamCenterSoThatTheMouseMapsTo(float camZoom, sf::Vector2f mouseCenteredOnWindow, sf::Vector2f mouseOnMap) {
@@ -130,12 +138,6 @@ void capZoom() {
     } else if (camZoom > ZOOM_MAX) {
         camZoom = ZOOM_MAX;
     }
-}
-
-void enterLevelSelect() {
-    //Maybe we get here more in the future. 
-    //But be aware, that in the case we swap between levels instantly, this might not very long. 
-    setMenu<MenuLevelSelect>();
 }
 
 void initEditor() {
@@ -217,6 +219,7 @@ void exitEditor() {
     delete[editorWidth*editorHeight] editorMetaA;
     delete[editorWidth*editorHeight] editorMetaB;
     editor = false;
+    debugMode = false;
 }
 
 //The bad, not deterministic menu handling is here. Totally dependent on the frames, called before every single render. 
@@ -237,17 +240,17 @@ void guiTick() {
     bool mouseAtMenu = local.x >= windowSize.x - MENU_WIDTH;
 
 
-    bool responsive = world.operator bool(); //&& !message
+    bool responsive = world.operator bool() && !message;
 
     if (menu != nullptr) {
         menu->guiTick(gameWindow->mapPixelToCoords(local, menuView), firstActuallyDown); //We want to click the menu always, the map not. 
     }
 
     if (firstDown) {
-        if (!menuPressed) {
+        if (!dragCurrentlyDisabled) {
             if (!lastFirstDown) {
-                if (mouseAtMenu) {
-                    menuPressed = true;
+                if (mouseAtMenu || message) {
+                    dragCurrentlyDisabled = true;
                 } else {
                     mouseDragStart = mouseOnMap;
                     mouseDragStartOnScreen = local;
@@ -258,13 +261,13 @@ void guiTick() {
             }
         }
     } else {
-        if (!menuPressed && lastFirstDown) {
+        if (!dragCurrentlyDisabled && lastFirstDown) {
             //Released mouse - if we didn't move the mouse, this was a click! 
             if (mouseDragStartOnScreen == local && responsive) {
                 onMapClicked(mouseOnMap);
             }
         }
-        menuPressed = false;
+        dragCurrentlyDisabled = false;
     }
  
     if (scrollSinceLastUpdate != 0.0f) {
@@ -291,6 +294,8 @@ void update() {
             i++;
         }
     }
+    world->update();
+    //just debug down here:
     updateTime = clock.restart().asMicroseconds()/10;
 }
 
@@ -308,9 +313,7 @@ void drawText(std::string s, sf::Vector2f pos) {
 void renderHUD() {
     if (world) {
         gameStatDisplay.draw(*target);
-    } else {
-        target->draw(splash);
-    }
+    } 
     if (debugMode) {
         drawText("FPS: " + std::to_string(lastFPS), sf::Vector2f(10.f, 20.f));
         drawText("TPS: " + std::to_string(tps), sf::Vector2f(10.f, 38.f));
@@ -319,6 +322,37 @@ void renderHUD() {
         if (editor) {
             drawText("Welcome to the cheapest editor ever seen, sorry for this. Modify meta with A + Scroll, S + Scroll. Print with enter. ", sf::Vector2f(10.f, 2.f));
         }
+    }
+}
+
+void renderCenteredHUD() {
+    if (!world) {
+        target->draw(splash);
+    } 
+    if (message) {
+        sf::RectangleShape shade(windowSize);
+        shade.setFillColor(COLORS_MESSAGE_SHADE);
+        shade.setOrigin(windowSize * 0.5f);
+        target->draw(shade);
+
+        sf::RectangleShape back(MESSAGE_SIZE);
+        back.setFillColor(COLORS_MESSAGE_BACK);
+        back.setOrigin(MESSAGE_SIZE * 0.5f);
+        target->draw(back);
+
+        sf::RectangleShape title(MESSAGE_TITLE_SIZE);
+        title.setFillColor(COLORS_MESSAGE_TITLE);
+        title.setOrigin(MESSAGE_TITLE_SIZE * 0.5f);
+        title.setPosition(MESSAGE_TITLE_POS);
+        target->draw(title);
+
+        sf::Text text;
+        text.setString(messageText);
+        text.setFillColor(COLORS_MESSAGE_TEXT);
+        text.setCharacterSize(18.f);
+        text.setFont(*mainFont);
+        text.setOrigin((int)(text.getLocalBounds().width * 0.5f), (int)(text.getLocalBounds().height * 0.5f));
+        target->draw(text);
     }
 }
 
@@ -353,6 +387,9 @@ void render(float delta) {
 
     target->setView(HUDView);
     renderHUD();
+
+    target->setView(centeredView);
+    renderCenteredHUD();
     
     target->setView(menuView);
     renderMenu();
@@ -396,7 +433,7 @@ int main() {
 
     updateViewport(sf::Vector2f((float)newSize.x, (float)newSize.y));
 
-    enterLevelSelect();
+    resetMenuWithoutSettingNewMenu();
 
     sf::Clock clock;
     sf::Clock FPSClock;
@@ -523,7 +560,17 @@ int main() {
 
 void resetMenu() {
     if (menu != nullptr) {
-        delete menu; //I just hope that ... you inheritance etc actually deletes the data of the whole menu subclass in there. 
+        delete menu; //I just hope that ... the inheritance etc actually deletes the data of the whole menu subclass in there. 
+    }
+    menu = nullptr;
+}
+
+void resetMenuWithoutSettingNewMenu() {
+    resetMenu();
+    if (world) {
+        setMenu<MenuMain>();
+    } else {
+        setMenu<MenuLevelSelect>();
     }
 }
 
@@ -548,7 +595,7 @@ void exitLevel() {
     std::cout << "This should now kill the world" << std::endl;
     world.reset();
     std::cout << "Now we have FINISHED deleting the world" << std::endl;
-    enterLevelSelect();
+    resetMenuWithoutSettingNewMenu();
 }
 
 void setWorld(std::string name) {
@@ -590,4 +637,31 @@ void setWorld(std::string name) {
 //Just a redirect, to the outside we load levels, on the inside, everything depends on the world being set or not, so its just naming. 
 void loadLevel(std::string name) {
     setWorld(name);
+    resetMenuWithoutSettingNewMenu();
+}
+
+template<class T>
+void setMessage(std::string s) {
+    if (world) {
+        world->onMessageShown();
+    }
+    if (!message) {
+        tpsBeforeMessage = tps;
+        updateGameSpeed(true, 60);
+    }
+    messageText = s;
+    message = true; 
+    setMenu<T>();
+}
+
+void resetMessage() {
+    if (!message) {
+        std::cout << "U sure u know what youre doing? You removed a message ... where no message was anymore." << std::endl;
+        return;
+    }
+    message = false;
+    if (tpsBeforeMessage > 0) {
+        updateGameSpeed(false, tpsBeforeMessage);
+    }
+    resetMenuWithoutSettingNewMenu();
 }

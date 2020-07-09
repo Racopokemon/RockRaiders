@@ -10,6 +10,9 @@
 #define ICON_1 40
 #define ICON_2 30
 #define ICON_3 20
+#define ICON_LEAVE 64
+#define ICON_HOME 173
+#define ICON_START 32
 
 #include <SFML/Graphics.hpp>
 

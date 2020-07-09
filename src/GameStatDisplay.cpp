@@ -1,6 +1,7 @@
 #include "GameStatDisplay.h"
 #include "TextureLoader.h"
 #include "Colors.h"
+#include "Menu.h"
 
 #define RIM 28.f
 #define GAP 35.f
@@ -19,7 +20,7 @@ GameStatDisplay::GameStatDisplay(std::shared_ptr<World> world, sf::Vector2f * vi
 }
         
 void GameStatDisplay::draw(sf::RenderTarget &target) {
-    sf::RectangleShape rect(sf::Vector2f(size->x, RIM + GAP * 2.5f));
+    sf::RectangleShape rect(sf::Vector2f(size->x - MENU_WIDTH, RIM + GAP * 2.5f));
     rect.setFillColor(COLORS_TRANS_BACK);
     rect.setPosition(sf::Vector2f(0, size->y - (RIM + GAP * 2.5f))); //top left as 
     target.draw(rect);

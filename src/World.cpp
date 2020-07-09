@@ -12,6 +12,8 @@
 #include "Ore.h"
 #include "JobDeliver.h"
 #include "JobPickup.h"
+#include "MenuLevelStart.h" 
+#include "MenuLevelWon.h" 
 
 World::World(std::string mapName) {
     reference = std::shared_ptr<World>(this);
@@ -143,12 +145,13 @@ void World::pickupDropped(std::shared_ptr<Pickup> p, bool droppedNew) {
     if (map->isAbsorbingPickups(pos)) {
         p->requestDeletion();
         if (find(storageTiles.begin(), storageTiles.end(), pos) != storageTiles.end()) {
-                //https://stackoverflow.com/questions/11951121/checking-if-a-pointer-points-to-a-particular-class-c
-                if (dynamic_cast<Crystal*>(p.get())) {
-                    crystals++;
-                } else if (dynamic_cast<Ore*>(p.get())) {
-                    ores++;
-                }
+            //https://stackoverflow.com/questions/11951121/checking-if-a-pointer-points-to-a-particular-class-c
+            if (dynamic_cast<Crystal*>(p.get())) {
+                crystals++;
+            } else if (dynamic_cast<Ore*>(p.get())) {
+                ores++;
+            }
+            checkWin();
         }
     } else if (map->isHoldingPickups(pos)) {
         if (!droppedNew) {
@@ -174,6 +177,31 @@ void World::getGameStatPointers(int ** crystals, int ** ores, int ** workers) {
     *crystals = &this->crystals;
     *ores = &this->ores;
     *workers = &this->workers;
+}
+
+void World::update() {
+    if (showWinMessage) {
+        showWinMessage = false;
+        setMessage<MenuLevelWon>("yeee victoree");
+    } else if (showStartMessage) {
+        showStartMessage = false; 
+        //Its better to schedule this and wait until one update and some frames have been seen until we show the message - 
+        //it might eg happen that main.cpp was still initializing the game speed after etc. 
+        setMessage<MenuLevelStart>("This is a test my chickens \nDo we support several lines?");
+    }
+}
+
+ void World::checkWin() {
+    if (!won) {
+        if (false) { //conditions
+            won = true;
+            showWinMessage = true;
+        }
+    }
+}
+
+void World::onMessageShown() {
+    //If selections are implemented: Remove them here! 
 }
 
 void World::deleteWorld() {

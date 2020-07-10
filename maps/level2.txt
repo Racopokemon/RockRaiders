@@ -53,6 +53,7 @@ Hehe see, we got all the 20 ores.
 Good work! About the workers, though ...
 ... I mean, we saved at least *some* of them. 
 Didn't we?
+(Level comleted!)
 
 ;
 ;	Main Map:
@@ -94,6 +95,9 @@ Didn't we?
 ##############------#####-----##HHH-----##############
 ######################################################
 
+;	To more comfortably change the meta values of a map, 
+;	you can load the level and press tab ingame for an editor.
+;
 ;	Metadata 1 (#Crystals, Rubble amount, Buildung ID, #workers)
 000000000000000000000000000000000000000000000000000000
 000000000000000000000000000000000000000000000000000000

@@ -86,7 +86,7 @@ sf::Sprite splash;
 void onMapClicked(sf::Vector2f pos) {
     //Here we might first check whether there was an entity that we clicked. 
     sf::Vector2i tilePos = LocatedEntity::toTile(pos);
-    if (world->getMap()->inMapBounds(tilePos)) {
+    if (world->getMap()->inMapBounds(tilePos) && !editor) {
         world->onTileClicked(pos);
     }
 }

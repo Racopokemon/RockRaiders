@@ -8,7 +8,7 @@
 ;	C Normal 3		#Crystals, #Ore
 ;	  Ground		#Workers, 1: Visible at start (and all connected)
 ;	. Rubble		Amount (0-5 with 5 the most), #Ore still inside
-;	= Plate			#Workers, 1: Visible at start (and all connected)
+;	= Plate			#Workers, 
 ;	+ Building		Number, Orientation
 ;	* Building Pl.	
 ;	O OreF			
@@ -36,23 +36,12 @@ img/map.png
 0
 
 ;	The level introduction text: 
-- ... So, just 20 crystals? Nothing more? Nothing
-   special?
-- Nothing special, thats all.
-- All, huh? Isn't this the same cave where you already
-    sent 8 men yesterday? 
-- That didn't ever return back?
-- Who we haven't heard literally anything about since? 
-- And why is the entrance blocked, that the team 
-   drill-opened yesterday?
-- You just collect 20 crystals. Thats your job. 
-- AND WHAT ABOUT THE TRAPPED WORKERS???
+Hey mate, mine 20 crystals or whatever.
+(Can span multiple lines, ended by one empty line)
 
 ;	The level completion text:
-Hehe see, we got all the 20 crystals. 
-Good work! About the workers, though ...
-... I mean, we saved at least *some* of them. 
-Didn't we?
+Good work! 
+(Can span multiple lines, ended by one empty line)
 
 ;
 ;	Main Map:
@@ -94,6 +83,9 @@ Didn't we?
 ######################################################
 ######################################################
 
+;	To more comfortably change the meta values of a map, 
+;	you can load the level and press tab ingame for an editor.
+;
 ;	Metadata 1 (#Crystals, Rubble amount, Buildung ID, #workers)
 000000000000000000000000000000000000000000000000000000
 000000000000000000000000000000000000000000000000000000

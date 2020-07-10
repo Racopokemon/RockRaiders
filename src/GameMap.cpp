@@ -368,7 +368,7 @@ void GameMap::setVisible(sf::Vector2i pos, bool recursionStart) {
             setVisible(pos + sf::Vector2i(1, 0), false);
             setVisible(pos + sf::Vector2i(-1, 0), false);
         }
-        if (b.getBlockType() == GROUND) {
+        if (b.getBlockType() == GROUND || b.getBlockType() == PLATE) {
             int workers = b.getWorkersAtStart();
             if (workers > 0) {
                 world->tileWithWorkersUncovered(pos, workers);
@@ -443,6 +443,7 @@ void GameMap::setGlobalVisibilityForEditor() {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             getBlock(sf::Vector2i(x,y)).setVisible();
+            getBlock(sf::Vector2i(x,y)).setShade(COLORS_SHADE_NONE);
         }
     }
     setModified();

@@ -6,6 +6,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "BlockPropertiesLookup.h"
+#include "Colors.h"
 
 
 /*!
@@ -31,8 +32,10 @@ struct Block {
     private :
         BlockType type;
         int metaA, metaB;
+        //All the things that come NOT from the file: 
         bool visible; 
         int connectedComponent = -1; 
+        sf::Color shade = COLORS_SHADE_INVISIBLE; 
     public :
         Block() {};
         Block(BlockType type, int metaA, int metaB) {
@@ -116,6 +119,14 @@ struct Block {
         void getMetaValuesForEditor(int * a, int * b) {
             *a = metaA;
             *b = metaB;
+        }
+
+        sf::Color getShade() {
+            return shade;
+        }
+
+        void setShade(sf::Color color) {
+            shade = color; 
         }
 
         bool isAbsorbingPickups();

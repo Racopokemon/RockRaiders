@@ -113,9 +113,11 @@ void World::onTileClicked(sf::Vector2f pos) {
     } else if (map->isBreakableWall(t)) {
         if (tileJobs->getJobDrill(t)) {
             tileJobs->cancelJobDrillBySystem(t);
+            map->resetShade(t); //This shade thing is hacky. It would be MUCH better to have the TileJobs control this, they are actually the reference for all these jobs. 
         } else {
             JobDrill * jd = new JobDrill(ref(), t);
             addJobToList(jd->ref());
+            map->setShade(t, COLORS_SHADE_DRILL);
         }
     }
 }

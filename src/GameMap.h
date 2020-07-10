@@ -94,6 +94,10 @@ class GameMap : public Entity {
 
         sf::Vector2f getCameraCenterOnStart();
 
+        void setShade(sf::Vector2i pos, sf::Color color);
+
+        void resetShade(sf::Vector2i pos);
+
     protected : 
 
         int width, height; 

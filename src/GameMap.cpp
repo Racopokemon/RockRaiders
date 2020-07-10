@@ -1,6 +1,7 @@
 #include "GameMap.h"
 #include "LocatedEntity.h"
 #include "TextureLoader.h"
+#include "Colors.h"
 
 #define TEXTURE_TILES_PER_ROW 8 //finally doing them consts like a boss ... ok "boss" ...
 
@@ -220,10 +221,7 @@ void GameMap::updateRenderData() {
             renderDataTextures[i+2].texCoords = sf::Vector2f(textureTile.left + textureTile.width - 0.5f, textureTile.top + textureTile.height - 0.5f);
             renderDataTextures[i+3].texCoords = sf::Vector2f(textureTile.left + 0.5f, textureTile.top + textureTile.height - 0.5f);
 
-            sf::Color c = sf::Color::Black;
-            if (getBlock(sf::Vector2i(x, y)).isVisible()) {
-                c = sf::Color::White;
-            }
+            sf::Color c = getBlock(sf::Vector2i(x, y)).getShade();
             for (int j = 0; j < 4; j++) {
                 renderDataTextures[i+j].color = c;
             }
@@ -363,6 +361,7 @@ void GameMap::setVisible(sf::Vector2i pos, bool recursionStart) {
     Block & b = getBlock(pos);
     if (recursionStart || !b.isVisible()) {
         b.setVisible();
+        b.setShade(COLORS_SHADE_NONE);
         if (!b.isGeneralWall()) {
             setVisible(pos + sf::Vector2i(0, 1), false);
             setVisible(pos + sf::Vector2i(0, -1), false);
@@ -447,6 +446,19 @@ void GameMap::setGlobalVisibilityForEditor() {
         }
     }
     setModified();
+}
+
+void GameMap::setShade(sf::Vector2i pos, sf::Color color) {
+    Block & b = getBlock(pos);
+    if (!b.isVisible()) {
+        throw "Cannot set shade of an not yet visible block. ";
+    }
+    b.setShade(color);
+    setModified();
+}
+
+void GameMap::resetShade(sf::Vector2i pos) {
+    setShade(pos, COLORS_SHADE_NONE);
 }
 
 /**! Here we assume that you know that this is block actually holds rubble. 

@@ -16,14 +16,14 @@ Not yet realized features are *italic*.
 
 * Singleplayer [**C**]
 * Loading a level from file [**B**]
-  * *3+ Levels should be doable* [**C**]
+  * We now have 3 Levels [**C**] playable from the main menu 
 * Technology
     - Top-down rendering with some textures. 
     - Enabling arbitrary framerates by interpolating motion between two ticks. This is also the foundation to the variable in-game time further below. [Maybe **C**]
     - Movable camera, zooming in and out.
 * Game
-  * *Two counters for the two resources*
-  * *A basic side-menu: Blocks in the cave are clickable and then tasks (drilling them at least) can be selected from the menu.*
+  * Two counters for the two resources
+  * A basic side-menu: Blocks in the cave are clickable and then tasks (drilling them at least) can be selected from the menu.
   * Drilled walls drop resources if written in the level file. 
   * A base station where all resources are brought
   * AI [maybe **B** or **A**]
@@ -46,11 +46,11 @@ Not yet realized features are *italic*.
   * Can be placed in level file
   * ~~Requires workers dropping resources there~~
   * Builders walk faster on ground plates (navigation considers this)
-* *Rubble*
-  * *Is on every ground square where a wall was drilled*
+* Rubble
+  * Is on every ground square where a wall was drilled
   * Can be placed in level file
-  * *Can be removed in 5 steps by workers as action when they stand there, spawning resources on the ground there*
-  * *AI-Task: Remove rubble*
+  * ~~Can be removed in 5 steps by workers as action when they stand there, spawning resources on the ground there~~
+  * ~~AI-Task: Remove rubble~~
   * Builders walk slower on rubble (navigation considers this)
 * Some eye-candy (there is at least a debug view that can be toggled with the space bar)
 
@@ -61,7 +61,7 @@ _I probably won’t realize many of those, but if I had infinite time, maybe I w
 * Simple tool for more convenient level creation (at least for setting metadata. Press tab in-game to modify metadata of an existing level)
 * Only connected caves are shown, new cave parts are revealed as they are discovered by drilling walls.
 * Different in-game time speeds (right now accessible with numbers 1-8)
-* *More menus to load levels, change game-time, …*
+* More menus to load levels, ~~change game-time ...~~
 * Enhanced Navigation, so that there is minimal variance in the workers paths, making it look more natural
 * ~~Navigation based on a navigation mesh for quicker /more realistic paths~~
 * Changing / pausing the in-game time somehow in-game.

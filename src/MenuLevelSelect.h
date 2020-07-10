@@ -5,6 +5,7 @@
 #include "Menu.h"
 #include "main.h"
 
+//!The base menu shown if were not ingame, allows to select levels or end the game
 class MenuLevelSelect : public Menu {
     public : 
         MenuLevelSelect(ButtonContext context) : Menu(context) {};

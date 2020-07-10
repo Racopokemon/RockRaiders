@@ -237,6 +237,10 @@ void World::checkWin() {
     }
 }
 
+MapData World::getMapData() {
+    return data;
+}
+
 void World::onMessageShown() {
     //If selections are implemented: Remove them here! 
 }

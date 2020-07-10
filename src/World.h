@@ -89,7 +89,8 @@ class World {
         //to match the state after the message was exited. 
         void onMessageShown();
 
-        
+        //!Actually there is no reason for other ones to read this ... except the player wants to read the task description again..
+        MapData getMapData();
 
     protected : 
 

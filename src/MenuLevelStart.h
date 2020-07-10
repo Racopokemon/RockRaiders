@@ -5,6 +5,7 @@
 #include "Menu.h"
 #include "main.h"
 
+//!The menu that is shown along with the level-start message
 class MenuLevelStart : public Menu {
     public : 
         MenuLevelStart(ButtonContext context) : Menu(context) {};

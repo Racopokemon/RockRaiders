@@ -5,6 +5,7 @@
 #include "Menu.h"
 #include "main.h"
 
+//!The menu that is shown along with "level won" message
 class MenuLevelWon : public Menu {
     public : 
         MenuLevelWon(ButtonContext context) : Menu(context) {};

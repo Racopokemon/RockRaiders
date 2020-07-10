@@ -36,8 +36,7 @@ img/map.png
 0
 
 ;	The level introduction text: 
-- ... So, just 20 ores? Nothing more? Nothing
-  special?
+- ... So, just 20 ores? Nothing more? Nothing special?
 - Nothing special, thats all.
 - All, huh? Isn't this the same cave where you already
   sent 8 men yesterday? 

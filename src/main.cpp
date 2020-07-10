@@ -354,7 +354,11 @@ void renderCenteredHUD() {
         text.setFillColor(COLORS_MESSAGE_TEXT);
         text.setCharacterSize(20.f);
         text.setFont(*mainFont);
-        text.setOrigin((int)(text.getLocalBounds().width * 0.5f), (int)(text.getLocalBounds().height * 0.5f));
+        //text.setOrigin(text.getLocalBounds().left + text.getLocalBounds().width * 0.5f, text.getLocalBounds().top + text.getLocalBounds().height * 0.5f);
+        sf::FloatRect b = text.getLocalBounds();
+        sf::Vector2f origin = sf::Vector2f(b.left + b.width * 0.5f, b.top + b.height * 0.5f);
+        text.setPosition(sf::Vector2f((int)(-origin.x), (int)(-origin.y)));
+        //Doing this manually to keep the text sharp. 
         target->draw(text);
     }
 }

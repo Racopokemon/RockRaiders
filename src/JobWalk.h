@@ -1,25 +1,18 @@
 #ifndef JOB_WALK_H
 #define JOB_WALK_H
 
-#include "Job.h"
+#include "JobAtTarget.h"
 #include <SFML/Graphics.hpp>
 
-class JobWalk : public Job {
+class JobWalk : public JobAtTarget {
     public :
-        JobWalk(std::shared_ptr<World> w, sf::Vector2f target) : Job(w) {
-            this->target = target;
-        }
-
-        virtual bool canBeExecutedBy(std::shared_ptr<JobDoer> jd) {
-            return world->getMap()->connected(jd->getPosition(), target);
-        }
+        JobWalk(std::shared_ptr<World> w, sf::Vector2f target) : JobAtTarget(w, target) {}
 
         virtual void onActionFinished(int callNumber) {
-            if (!nextActionIsFinish) {
-                doer->walkTo(target);
-                nextActionIsFinish = true;
+            if (callNumber == 0) {
+                 doer->onJobFinished();
             } else {
-                doer->onJobFinished();
+                throw "3rd onActionFinished call on JobWalk";
             }
         }
         virtual void onCancelledByUser() {
@@ -28,9 +21,6 @@ class JobWalk : public Job {
             //Therefore we just compete the deletion of the Job:
             deleteLastReference();
         }
-    protected :
-        bool nextActionIsFinish = false; 
-        sf::Vector2f target;
 };
 
 #endif

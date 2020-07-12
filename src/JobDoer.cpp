@@ -105,6 +105,26 @@ void JobDoer::walkTo(sf::Vector2f v) {
         cancelJobByUser();
     }
 }
+void JobDoer::walkTo(std::vector<sf::Vector2f> v) {
+    if (JOB_DOER_BUSY) {
+        throw std::exception("WalkTo called on JobDoer, that was still busy with another task");
+    }
+    state = walking; 
+    starting = true; 
+    path = world->getMap()->findPathBetween(getTile(), LocatedEntity::toTiles(v));
+    if (path.empty()) {
+        std::cout << "THIS IS AN ERROR! There was no path found to the destination of the JobDoer. Therefore the jobDoer is actually not able to perform the Job and cancels it now!" << std::endl;
+        path.push_back(getTile());
+        cancelJobByUser();
+    }
+    pathEnd = LocatedEntity::getTileCenter(path.back());
+    for (auto vec : v) {
+        if (LocatedEntity::toTile(vec) == path.back()) {
+            pathEnd = vec;
+            break;
+        }
+    }
+}
 void JobDoer::playAnimation(std::string s, void * data) {
     if (JOB_DOER_BUSY) {
         throw std::exception("playAnimation called on JobDoer, that was still busy with another task");

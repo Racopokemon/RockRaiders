@@ -14,6 +14,7 @@
 #include "JobPickup.h"
 #include "MenuLevelStart.h" 
 #include "MenuLevelWon.h" 
+#include "JobAtTarget.h"
 
 World::World(std::string mapName) {
     reference = std::shared_ptr<World>(this);
@@ -70,13 +71,56 @@ void World::requestJob(std::shared_ptr<JobDoer> j) {
             j->setJob(std::dynamic_pointer_cast<JobDeliver>(jd->ref()));
         }
     } else {
+        int availableJobs = 0;
+        
+        int selectedJobIndex = -1;
+
+        std::vector<sf::Vector2f> possiblePositions;
+        std::vector<int> possibleJobIndices;
+        int i = 0;
+        while (i < jobList.size()) {
+            std::shared_ptr<Job> element = jobList[i];
+            if (element->canBeExecutedBy(j)) {
+                std::shared_ptr<JobAtTarget> jat = std::dynamic_pointer_cast<JobAtTarget>(element);
+                if (jat) {
+                    availableJobs++;
+                    std::vector<sf::Vector2f> targets = jat->getTargets();
+                    for (auto target : targets) {
+                        possiblePositions.push_back(target);
+                        possibleJobIndices.push_back(i); //yes, we just add it several times, to be able to look it up easily
+                    }
+                } else {
+                    //cast was unsuccessful, we have no clue what it takes to do this job, but the JobDoer CAN do it, 
+                    //so just assign this job and go (will not happen with the jobs right now anyway)
+                    selectedJobIndex = i;
+                    break;
+                }
+            }
+            i++;
+        }
+
+        if (selectedJobIndex == -1) {
+            if (availableJobs == 0) {
+                return; //No job, I'm sorry
+            }
+            if (availableJobs == 1) {
+                selectedJobIndex = possibleJobIndices[0];
+            } else {
+                int index;
+                map->getClosest(j->getPosition(), possiblePositions, &index);
+                selectedJobIndex = possibleJobIndices[index];
+            }
+        }
+
+        /*//BEGIN OLD
         auto it = jobList.begin();
         while (it != jobList.end() && !(*it)->canBeExecutedBy(j)) {
             it++;
         }
-        if (it != jobList.end()) {
-            j->setJob(*it);
-            jobList.erase(it);
+        */
+        if (selectedJobIndex != -1) {
+            j->setJob(jobList[selectedJobIndex]);
+            jobList.erase(jobList.begin()+selectedJobIndex);
         } else {
             //No job found for you, I'm sorry little one
         }

@@ -31,6 +31,8 @@ class JobDoer : public LocatedEntity {
         //Things Jobs tell us to do
 
         void walkTo(sf::Vector2f v);
+        //!Walks to one (the nearest) of the positions
+        void walkTo(std::vector<sf::Vector2f> v);
         //!Depending on the animation name, you can pass additional information with the data pointer 
         //(that is then known by you and the JobDoer). Put the data on the heap, we might only read it later.
         void playAnimation(std::string s, void * data = nullptr);

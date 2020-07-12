@@ -2,14 +2,14 @@
 #define JOB_PICKUP_H
 
 #include "Shortcuts.h"
-#include "Job.h"
+#include "JobAtTarget.h"
 #include "Pickup.h"
 #include "GameMap.h"
 #include <iostream>
 
-class JobPickup : public Job {
+class JobPickup : public JobAtTarget {
     public :
-        JobPickup(std::shared_ptr<World> w, std::shared_ptr<Pickup> p) : Job(w) {
+        JobPickup(std::shared_ptr<World> w, std::shared_ptr<Pickup> p) : JobAtTarget(w, p->getPosition()) {
             pickup = p;
             p->setJob(std::dynamic_pointer_cast<JobPickup>(ref()));
         }
@@ -17,18 +17,17 @@ class JobPickup : public Job {
         virtual ~JobPickup() {}
 
         virtual bool canBeExecutedBy(std::shared_ptr<JobDoer> jd) {
-            if (world->getMap()->connected(pickup->getPosition(), world->getStorageLocations())) { //this later needs to be expanded for any place to drop pickups (all constructions)
-                return world->getMap()->connected(jd->getPosition(), pickup->getPosition());
+            if (world->getMap()->connected(pickup->getPosition(), world->getStorageLocations())) { 
+                //this later needs to be expanded for any place to drop pickups (all construction sites)
+                return JobAtTarget::canBeExecutedBy(jd);
             }
             return false; //No place (storage locations at least) to drop this pickup, ignore me please. 
         }
 
         virtual void onActionFinished(int callNumber) {
             if (callNumber == 0) {
-                doer->walkTo(pickup->getPosition());
-            } else if (callNumber == 1) {
                 doer->pickUpAnimation(pickup);
-            } else if (callNumber == 2) {
+            } else if (callNumber == 1) {
                 pickup->unsetJob();
                 doer->onJobFinished();
             } else {

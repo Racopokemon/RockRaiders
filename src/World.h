@@ -97,7 +97,7 @@ class World {
         void pickupDropped(std::shared_ptr<Pickup> p, bool droppedNew);
 
         std::shared_ptr<GameMap> map; 
-        std::list<std::shared_ptr<Job>> jobList; 
+        std::vector<std::shared_ptr<Job>> jobList; 
 
         std::vector<sf::Vector2f> storageLocations;
         std::vector<sf::Vector2i> storageTiles;

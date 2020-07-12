@@ -57,7 +57,7 @@ img/map.png
 - yessir. ... Jesus, here we go again ..
 
 ;	The level completion text:
-Hey nice, we *actually* found a way back to the base - 
+Hey nice, we actually found a way back to the base - 
 and picked up all five crystals up there! 
   
 Good work, this mine is clear now! 

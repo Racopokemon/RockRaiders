@@ -2,32 +2,34 @@
 #define JOB_DRILL_H
 
 #include <SFML/Graphics.hpp>
-#include "Job.h"
+#include "JobAtTarget.h"
 #include "World.h"
 #include "TileJobs.h"
 #include "Worker.h"
 #include "GameMap.h"
 
+#define DRILL_DISTANCE 0.05f
 
-class JobDrill : public Job {
+class JobDrill : public JobAtTarget {
     public : 
-        JobDrill(std::shared_ptr<World> w, sf::Vector2i t) : Job(w) {
+        JobDrill(std::shared_ptr<World> w, sf::Vector2i t) : JobAtTarget(w) {
             target = t;
+            sf::Vector2f center = LocatedEntity::getTileCenter(t);
+            //This will actually cause crashes when blocks at the rim of the map are not massive. 
+            //But ... who would do that?
+            targets.push_back(center + sf::Vector2f(0, 0.5f+DRILL_DISTANCE));
+            targets.push_back(center + sf::Vector2f(0, -0.5f-DRILL_DISTANCE));
+            targets.push_back(center + sf::Vector2f(0.5f+DRILL_DISTANCE, 0));
+            targets.push_back(center + sf::Vector2f(-0.5f-DRILL_DISTANCE, 0));
+
             world->getTileJobs()->setJobDrill(t, std::dynamic_pointer_cast<JobDrill>(ref()));
-        }
-        bool canBeExecutedBy(std::shared_ptr<JobDoer> jd) {
-            return world->getMap()->connected(jd->getTile(), getAdjacentPositions());
         }
         void onActionFinished(int callNumber) {
             if (callNumber == 0) {
-                sf::Vector2i dest = world->getMap()->getClosest(doer->getTile(), getAdjacentPositions());
-                sf::Vector2i diff = target - dest;
-                doer->walkTo(sf::Vector2f(dest.x + 0.5f + diff.x*0.45f, dest.y + 0.5f + diff.y*0.45f)); 
-            } else if (callNumber == 1) {
                 int * data = new int;
                 *data = world->getMap()->getWallStrength(target);
                 doer->playAnimation(ANIMATION_DRILL, data);
-            } else if (callNumber == 2) {
+            } else if (callNumber == 1) {
                 world->getTileJobs()->unsetJobDrill(target);
                 world->destroyWall(target);
                 doer->onJobFinished();//this might kill us, lets do all important things before!
@@ -45,16 +47,6 @@ class JobDrill : public Job {
 
     protected : 
         sf::Vector2i target;
-        std::vector<sf::Vector2i> getAdjacentPositions() {
-            std::vector<sf::Vector2i> pos;
-            pos.push_back(target+sf::Vector2i(0, 1)); 
-            pos.push_back(target+sf::Vector2i(0, -1)); 
-            pos.push_back(target+sf::Vector2i(1, 0)); 
-            pos.push_back(target+sf::Vector2i(-1, 0)); 
-            //This actually might cause crashes when blocks at the rim of the map are not massive. 
-            //But ... who would do that?
-            return pos;
-        }
 };
 
 #endif

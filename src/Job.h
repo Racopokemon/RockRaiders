@@ -40,7 +40,7 @@ class Job {
         //CallNumber is an internal counter, starting from 0 after onJobStarted, that you may use ... or just ignore. 
         virtual void onActionFinished(int callNumber) = 0; 
         //!See onActionFinished(int callNumber). This is actually called, before we add the counter. 
-        void onActionFinished();
+        virtual void onActionFinished();
         //!This Job was cancelled (and the JobDoer already erased us etc.) but the Job probably still needs to be done, and the target still thinks that this
         //Job is on it! Decide if the Job should still be done, and then do the right preparations! Delete this job by removing the reference in the target and
         //call deleteLastReference(). 
@@ -67,7 +67,6 @@ class Job {
 
         std::shared_ptr<Job> reference = std::shared_ptr<Job>(this); 
 
-    private : 
         int callNumber;
 };
 

@@ -42,9 +42,9 @@ class GameMap : public Entity {
         //!True, if one of the targets is reachable
         bool connected(sf::Vector2f start, std::vector<sf::Vector2f> targets);
         //!If none of the targets is reachable, x and y of the result are -1.
-        sf::Vector2i getClosest(sf::Vector2i start, std::vector<sf::Vector2i> targets);
+        sf::Vector2i getClosest(sf::Vector2i start, std::vector<sf::Vector2i> targets, int * closestIndex = nullptr);
         //!If none of the targets is reachable, x and y of the result are -1.
-        sf::Vector2f getClosest(sf::Vector2f start, std::vector<sf::Vector2f> targets);
+        sf::Vector2f getClosest(sf::Vector2f start, std::vector<sf::Vector2f> targets, int * closestIndex = nullptr);
         //!Maybe try not using this (too much, the world needs it in the beginning eg) and rather request the properties (wall, walkable, ...)
         BlockType getBlockType(sf::Vector2i pos);
 

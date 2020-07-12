@@ -174,24 +174,45 @@ bool GameMap::connected(sf::Vector2f start, std::vector<sf::Vector2f> targets) {
     return connected(LocatedEntity::toTile(start), LocatedEntity::toTiles(targets));
 }
 
-sf::Vector2i GameMap::getClosest(sf::Vector2i start, std::vector<sf::Vector2i> targets) {
+sf::Vector2i GameMap::getClosest(sf::Vector2i start, std::vector<sf::Vector2i> targets, int * closestIndex) {
     int i;
     std::vector<sf::Vector2i> path = findPathBetween(start, targets);
     if (path.empty()) {
+        if (closestIndex != nullptr) {
+            *closestIndex = -1;
+        }
         return sf::Vector2i(-1, -1);
     } else {
-        return path[path.size()-1];
+        sf::Vector2i closest = path[path.size()-1];
+        if (closestIndex != nullptr) {
+             *closestIndex = -1;
+            for (int i = 0; i < targets.size(); i++) {
+                if (targets[i] == closest) {
+                    *closestIndex = i;
+                    break;
+                }
+            }
+        }
+        return closest;
     }
 }
-sf::Vector2f GameMap::getClosest(sf::Vector2f start, std::vector<sf::Vector2f> targets) {
+sf::Vector2f GameMap::getClosest(sf::Vector2f start, std::vector<sf::Vector2f> targets, int * closestIndex) {
     sf::Vector2i pos = getClosest(LocatedEntity::toTile(start), LocatedEntity::toTiles(targets));
+    if (closestIndex != nullptr) {
+        *closestIndex = -1;
+    }
     if (pos == sf::Vector2i(-1, -1)) {
         return sf::Vector2f(-1, -1);
     }
+    int i = 0;
     for (sf::Vector2f v : targets) {
         if (LocatedEntity::toTile(v) == pos) {
+            if (closestIndex != nullptr) {
+                *closestIndex = i;
+            }
             return v;
         }
+        i++;
     }
     std::cout << "Congrats, you reached a line of code that should be impossible to reach. (GameMap::getClosest)" << std::endl;
     return sf::Vector2f(-1, -1);

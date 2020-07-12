@@ -36,7 +36,8 @@ set(var_main_sources
 	MenuLevelSelect.h
 	MenuLevelStart.h
 	MenuLevelWon.h
-	MapData.h)
+	MapData.h
+	JobAtTarget.cpp)
 
 find_package(SFML 2.5.1 COMPONENTS audio graphics window system REQUIRED)
 

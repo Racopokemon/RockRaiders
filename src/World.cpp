@@ -123,7 +123,7 @@ void World::requestJob(std::shared_ptr<JobDoer> j) {
     }
 }
 
-void World::addJob(std::shared_ptr<Job> j) {
+void World::requestWorker(std::shared_ptr<Job> j) {
     std::shared_ptr<JobAtTarget> jat = std::dynamic_pointer_cast<JobAtTarget>(j);
 
     int chosenWorkerIndex = -1;
@@ -164,6 +164,16 @@ void World::addJob(std::shared_ptr<Job> j) {
         workerList[chosenWorkerIndex]->setJob(j);
         workerList.erase(workerList.begin()+chosenWorkerIndex);
     }
+}
+
+
+void World::addJob(std::shared_ptr<Job> j) {
+    jobList.push_back(j);
+    scheduleRematch();
+}
+
+void World::scheduleRematch() {
+    rematch = true;
 }
 
 void World::removeJobFromList(std::shared_ptr<Job> j) {
@@ -213,11 +223,25 @@ void World::destroyWall(sf::Vector2i pos) {
         Ore * o = new Ore(ref(), map->getRandomPositionInTile(pos, 0.2f), false);
         addEntity(o->ref());
     }
-    rematchJobsAndWorkers();
+    scheduleRematch();
 }
 
 void World::rematchJobsAndWorkers() {
-    if (workerList.size() < jobList.size()) {
+    int numberOfJobsThatActuallyCanBeExecuted = 0;
+    for (std::shared_ptr<Job> j : jobList) {
+        for (auto jd : workerList) {
+            if (j->canBeExecutedBy(jd)) {
+                numberOfJobsThatActuallyCanBeExecuted++;
+            }
+            break; 
+        }
+        if (numberOfJobsThatActuallyCanBeExecuted >= workerList.size()) {
+            break; 
+        }
+    }
+
+    //if (workerList.size() < jobList.size()) { //This heuristic breaks when there are many dead jobs (no base: All pick up jobs are dead)
+    if (workerList.size() < numberOfJobsThatActuallyCanBeExecuted) {
         //The idea: Some workers, many jobs: The workers pick their closest ones
         std::vector<std::shared_ptr<JobDoer>> wList = workerList;
         workerList.clear();
@@ -229,7 +253,7 @@ void World::rematchJobsAndWorkers() {
         std::vector<std::shared_ptr<Job>> jList = jobList;
         jobList.clear();
         for (auto j : jList) {
-            addJob(j);
+            requestWorker(j);
         }
     }
 }
@@ -296,6 +320,10 @@ void World::update() {
         //Its better to schedule this and wait until one update and some frames have been seen until we show the message - 
         //it might eg happen that main.cpp was still initializing the game speed after etc. 
         setMessage<MenuLevelStart>(data.startText);
+    }
+    if (rematch) {
+        rematchJobsAndWorkers();
+        rematch = false;
     }
 }
 

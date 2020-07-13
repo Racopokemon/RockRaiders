@@ -94,6 +94,8 @@ class World {
 
         void requestWorker(std::shared_ptr<Job> j);
 
+        void scheduleRematch();
+
         //!Called when the map changes, so that there are more tiles reachable now (and possible in other cases, like when new buildings are available etc)
         //Every event, that might cause that some of the workers with no jobs assigned could NOW do some of the jobs not assigned that nobody could execute before. 
         void rematchJobsAndWorkers();
@@ -113,6 +115,8 @@ class World {
         int crystals = 0;
         int ores = 0;
         int artifacts = 0;
+
+        bool rematch = false;
 
         MapData data;
         //!If the win conditions are fulfilled, we get everything ready to show the message and store that this level is won. 

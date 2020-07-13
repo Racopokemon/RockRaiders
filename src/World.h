@@ -34,13 +34,9 @@ class World {
         //! The mastermind of job scheduling. 
         //Here we assign a job to the JobDoer, that he is able to perform (also reachable etc.)
         void requestJob(std::shared_ptr<JobDoer> j);
-            //If jd is carrying something: Bring it somewhere
 
-            //Ellllse: Check the job list and assign the first compatible job
-
-            //Nothing found: Return nullptr
-
-        void addJobToList(std::shared_ptr<Job> j);
+        //!If we can instantly assign it, we do that. Otherwise the job is stored in our job list
+        void addJob(std::shared_ptr<Job> j);
 
         void removeJobFromList(std::shared_ptr<Job> j);
 
@@ -96,8 +92,15 @@ class World {
 
         void pickupDropped(std::shared_ptr<Pickup> p, bool droppedNew);
 
+        void requestWorker(std::shared_ptr<Job> j);
+
+        //!Called when the map changes, so that there are more tiles reachable now (and possible in other cases, like when new buildings are available etc)
+        //Every event, that might cause that some of the workers with no jobs assigned could NOW do some of the jobs not assigned that nobody could execute before. 
+        void rematchJobsAndWorkers();
+
         std::shared_ptr<GameMap> map; 
         std::vector<std::shared_ptr<Job>> jobList; 
+        std::vector<std::shared_ptr<JobDoer>> workerList; 
 
         std::vector<sf::Vector2f> storageLocations;
         std::vector<sf::Vector2i> storageTiles;

@@ -131,6 +131,23 @@ std::vector<sf::Vector2i> GameMap::findPathBetween(sf::Vector2i start, sf::Vecto
 }
 
 std::vector<sf::Vector2i> GameMap::findPathBetween(sf::Vector2i start, std::vector<sf::Vector2i> targets, int & length, int exitConditionLength) {
+    //Some quick sanity checks might prevent lots of work (even if most times this is already checked, but not all)
+    int cc = getBlock(start).getConnectedComponent();
+    if (cc == -1) {
+        return std::vector<sf::Vector2i>();
+    } else {
+        bool yesTheresSomething = false;
+        for (int i = 0; i < targets.size(); i++) {
+            if (getBlock(targets[i]).getConnectedComponent() == cc) {
+                yesTheresSomething = true;
+                break; 
+            }
+        }
+        if (!yesTheresSomething) {
+            return std::vector<sf::Vector2i>();
+        }
+    }
+    //Sanity checks: End.
     return getGraph()->findPathBetween(start, targets, length, exitConditionLength);
 }
 
@@ -216,6 +233,51 @@ sf::Vector2f GameMap::getClosest(sf::Vector2f start, std::vector<sf::Vector2f> t
     }
     std::cout << "Congrats, you reached a line of code that should be impossible to reach. (GameMap::getClosest)" << std::endl;
     return sf::Vector2f(-1, -1);
+}
+
+sf::Vector2f GameMap::getClosest(std::vector<sf::Vector2f> starts, std::vector<sf::Vector2f> targets, int * closestTargetIndex) {
+    bool flip = starts.size() > targets.size();
+    std::vector<sf::Vector2i> s;
+    std::vector<sf::Vector2i> t;
+    if (flip) {
+        t = LocatedEntity::toTiles(starts);
+        s = LocatedEntity::toTiles(targets);
+    } else {
+        s = LocatedEntity::toTiles(starts);
+        t = LocatedEntity::toTiles(targets);
+    }
+    sf::Vector2i minTarget;
+    unsigned int min = ~0u;
+    for (sf::Vector2i start : s) {
+        int length;
+        std::vector<sf::Vector2i> path = findPathBetween(start, t, length, min);
+        if (!path.empty()) {
+            if (length < min) {
+                min = length;
+                if (flip) {
+                    minTarget = start;
+                } else {
+                    minTarget = path.back();
+                }
+            }
+        }
+    }
+    if (min == ~0u) {
+        if (closestTargetIndex != nullptr) {
+            *closestTargetIndex = -1;
+        }
+        return sf::Vector2f(-1, -1);
+    } else {
+        for (int i = 0; i < targets.size(); i++) {
+            if (LocatedEntity::toTile(targets[i]) == minTarget) {
+                if (closestTargetIndex != nullptr) {
+                    *closestTargetIndex = i;
+                }
+                return targets[i];
+            }
+        }
+        throw "wtf this line in GameMap.getClosest should be not reachable";
+    }
 }
 
 int GameMap::getMovementSpeed(sf::Vector2i pos) {

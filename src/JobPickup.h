@@ -38,7 +38,7 @@ class JobPickup : public JobAtTarget {
         virtual void onCancelledByUser() {
             pickup->unsetJob();
             JobPickup * jp = new JobPickup(world, pickup);
-            world->addJobToList(jp->ref());
+            world->addJob(jp->ref());
             deleteLastReference();
         }
 

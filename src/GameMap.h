@@ -44,7 +44,10 @@ class GameMap : public Entity {
         //!If none of the targets is reachable, x and y of the result are -1.
         sf::Vector2i getClosest(sf::Vector2i start, std::vector<sf::Vector2i> targets, int * closestIndex = nullptr);
         //!If none of the targets is reachable, x and y of the result are -1.
-        sf::Vector2f getClosest(sf::Vector2f start, std::vector<sf::Vector2f> targets, int * closestIndex = nullptr);
+        sf::Vector2f getClosest(sf::Vector2f start, std::vector<sf::Vector2f> targets, int * closestTargetIndex = nullptr);
+        //!Finds the closest between any of both vectors. 
+        //This easily gets computational intensive. We use here that we expect our graph to be a digraph and maybe flip starts and targets. 
+        sf::Vector2f getClosest(std::vector<sf::Vector2f> starts, std::vector<sf::Vector2f> targets, int * closestTargetIndex = nullptr);
         //!Maybe try not using this (too much, the world needs it in the beginning eg) and rather request the properties (wall, walkable, ...)
         BlockType getBlockType(sf::Vector2i pos);
 

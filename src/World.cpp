@@ -101,9 +101,8 @@ void World::requestJob(std::shared_ptr<JobDoer> j) {
 
         if (selectedJobIndex == -1) {
             if (availableJobs == 0) {
-                return; //No job, I'm sorry
-            }
-            if (availableJobs == 1) {
+                //No job, I'm sorry
+            } else if (availableJobs == 1) {
                 selectedJobIndex = possibleJobIndices[0];
             } else {
                 int index;
@@ -112,23 +111,59 @@ void World::requestJob(std::shared_ptr<JobDoer> j) {
             }
         }
 
-        /*//BEGIN OLD
-        auto it = jobList.begin();
-        while (it != jobList.end() && !(*it)->canBeExecutedBy(j)) {
-            it++;
-        }
-        */
         if (selectedJobIndex != -1) {
             j->setJob(jobList[selectedJobIndex]);
             jobList.erase(jobList.begin()+selectedJobIndex);
         } else {
             //No job found for you, I'm sorry little one
+            workerList.push_back(j);
+            //This woker can't do any of the jobs available (maybe there are just no jobs) We store it and wait until
+            //new jobs occur, or the map expands, leading to new accessible areas etc
         }
     }
 }
 
-void World::addJobToList(std::shared_ptr<Job> j) {
-    jobList.push_back(j);
+void World::addJob(std::shared_ptr<Job> j) {
+    std::shared_ptr<JobAtTarget> jat = std::dynamic_pointer_cast<JobAtTarget>(j);
+
+    int chosenWorkerIndex = -1;
+
+    if (!jat) {
+        //Does not happen yet anyway. 
+        for (int i = 0; i < workerList.size(); i++) {
+            std::shared_ptr<JobDoer> doer = workerList[i];
+            if (j->canBeExecutedBy(doer)) {
+                chosenWorkerIndex = i;
+                break;
+            }
+        }
+    } else {
+        std::vector<int> workerIndices;
+        std::vector<sf::Vector2f> workerPositions;
+        int workerCount = 0;
+        for (int i = 0; i < workerList.size(); i++) {
+            std::shared_ptr<JobDoer> doer = workerList[i];
+            if (j->canBeExecutedBy(doer)) {
+                workerIndices.push_back(i);
+                workerPositions.push_back(doer->getPosition());
+                workerCount++;
+            }
+        }
+        if (workerCount == 0) {
+            //No worker available. We stay at -1 and will add the job to the list
+        } else if (workerCount == 1) {
+            chosenWorkerIndex = workerIndices[0];
+        } else {
+            map->getClosest(jat->getTargets(), workerPositions, &chosenWorkerIndex);
+        }
+    }
+
+    if (chosenWorkerIndex == -1) {
+        jobList.push_back(j);
+    } else {
+        workerList[chosenWorkerIndex]->setJob(j);
+        workerList.erase(workerList.begin()+chosenWorkerIndex);
+    }
 }
 
 void World::removeJobFromList(std::shared_ptr<Job> j) {
@@ -153,14 +188,14 @@ void World::onTileClicked(sf::Vector2f pos) {
     }
     if (map->isPositionWalkable(t)) {
         JobWalk * j = new JobWalk(world, pos);
-        addJobToList(j->ref());
+        addJob(j->ref());
     } else if (map->isBreakableWall(t)) {
         if (tileJobs->getJobDrill(t)) {
             tileJobs->cancelJobDrillBySystem(t);
             map->resetShade(t); //This shade thing is hacky. It would be MUCH better to have the TileJobs control this, they are actually the reference for all these jobs. 
         } else {
             JobDrill * jd = new JobDrill(ref(), t);
-            addJobToList(jd->ref());
+            addJob(jd->ref());
             map->setShade(t, COLORS_SHADE_DRILL);
         }
     }
@@ -177,6 +212,25 @@ void World::destroyWall(sf::Vector2i pos) {
     for (int i = 0; i < ore; i++) {
         Ore * o = new Ore(ref(), map->getRandomPositionInTile(pos, 0.2f), false);
         addEntity(o->ref());
+    }
+    rematchJobsAndWorkers();
+}
+
+void World::rematchJobsAndWorkers() {
+    if (workerList.size() < jobList.size()) {
+        //The idea: Some workers, many jobs: The workers pick their closest ones
+        std::vector<std::shared_ptr<JobDoer>> wList = workerList;
+        workerList.clear();
+        for (auto w : wList) {
+            requestJob(w);
+        }
+    } else {
+        //But here: Many workers, only some jobs: The jobs pick the closest workers
+        std::vector<std::shared_ptr<Job>> jList = jobList;
+        jobList.clear();
+        for (auto j : jList) {
+            addJob(j);
+        }
     }
 }
 
@@ -209,7 +263,7 @@ void World::pickupDropped(std::shared_ptr<Pickup> p, bool droppedNew) {
     } else {
         if (!p->hasJob()) {
             JobPickup * jp = new JobPickup(ref(), p);
-            addJobToList(jp->ref());
+            addJob(jp->ref());
         }
     }
 }

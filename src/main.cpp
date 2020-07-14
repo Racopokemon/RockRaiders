@@ -1,5 +1,9 @@
 //This is the pretty messy main file. Better take a look at the other, way more structured files ;)
 
+//https://stackoverflow.com/questions/2139637/hide-console-of-windows-application
+//Ive been googling SOO LONG for this, without the .exe opens a console with
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+
 #include "main.h"
 
 #include <iostream>

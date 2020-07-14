@@ -154,7 +154,9 @@ void World::requestWorker(std::shared_ptr<Job> j) {
         } else if (workerCount == 1) {
             chosenWorkerIndex = workerIndices[0];
         } else {
-            map->getClosest(jat->getTargets(), workerPositions, &chosenWorkerIndex);
+            int shortestIndexInIndicesList;
+            map->getClosest(jat->getTargets(), workerPositions, &shortestIndexInIndicesList);
+            chosenWorkerIndex = workerIndices[shortestIndexInIndicesList];
         }
     }
 
@@ -227,13 +229,16 @@ void World::destroyWall(sf::Vector2i pos) {
 }
 
 void World::rematchJobsAndWorkers() {
+    if (workerList.size() > workers) {
+        throw "uh yeah, we have some workers twice in here *slow clap*";
+    }
     int numberOfJobsThatActuallyCanBeExecuted = 0;
     for (std::shared_ptr<Job> j : jobList) {
         for (auto jd : workerList) {
             if (j->canBeExecutedBy(jd)) {
                 numberOfJobsThatActuallyCanBeExecuted++;
+                break; 
             }
-            break; 
         }
         if (numberOfJobsThatActuallyCanBeExecuted >= workerList.size()) {
             break; 
